@@ -16,7 +16,7 @@ const findById = function(id){
   })
 }
 
-const Create = function(customer){
+const create = function(customer){
   return new Promise((resolve, reject) => {
     const newCustomer = {id: uuidv4(), ...customer}
     customers.push(newCustomer)
@@ -25,9 +25,25 @@ const Create = function(customer){
   })
 }
 
+const checkValidity = function(params){
+  const {username, password} = params;
+
+  return new Promise((resolve, reject) => {
+    customers.forEach(customer => {
+      if(customer.username === username && customer.password===password){
+        resolve(customer);
+      }
+    });
+    reject({
+      message: 'Wrong username or password'
+    });
+  })
+}
+
 module.exports = {
   findAll,
   findById,
-  Create
+  create,
+  checkValidity
 }
 

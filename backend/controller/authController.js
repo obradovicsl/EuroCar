@@ -6,7 +6,6 @@ const { promisify } = require('util');
 
 
 const signToken = (id) => {
-    console.log(process.env.JWT_SECRET);
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
@@ -47,24 +46,26 @@ exports.signup = catchAsync(async (req, res, next) => {
     customerType: 3
   }
 
-  const newCustomer = await Customer.Create(customer);
+  const newCustomer = await Customer.create(customer);
 
   createSendToken(newCustomer, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
-  const { email, password } = req.body;
+  const { username, password } = req.body;
 
-  //Provera da li je korisnik uneo email i sifru
-  if (!email || !password) {
-    return next(new AppError('Please provide email and password', 400));
+  //Provera da li je korisnik uneo username i sifru
+  if (!username || !password) {
+    return next(new AppError('Please provide username and password', 400));
   }
 
-  //Provera da li su email i sifra validni
-  const user = await Customer.checkValidity({email, password});
+  console.log("eee");
+  //Provera da li su username i sifra validni
+  const user = await Customer.checkValidity({username, password});
+  console.log("eee");
 
   if (!user) {
-    return next(new AppError('Incorrect email or password', 401));
+    return next(new AppError('Incorrect username or password', 401));
   }
 
   //Kreiramo i saljemo web token

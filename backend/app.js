@@ -3,6 +3,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const facilityRouter = require('./routes/facillityRoutes');
 const customerRoutes = require('./routes/customerRoutes');
+const globalErrorHandler = require('./controller/errorController');
 
 const app = express();
 
@@ -33,5 +34,7 @@ app.use('/api/v1/customers', customerRoutes);
 app.all('*', (req, res, next)=> {
     next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
+
+app.use(globalErrorHandler);
 
 module.exports = app;
