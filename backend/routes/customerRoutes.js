@@ -12,12 +12,12 @@ router.post('/login', authController.login);
 router
   .route('/')
   .get(customerController.getAllCustomers)
-  .post(customerController.createUser);
+  .post(customerController.createCustomer);
   
 router
   .route('/:id')
   .get(customerController.getCustomer)
-  .patch(customerController.updateUser)
-  .delete(customerController.deleteUser);
+  .patch(customerController.updateCustomer)
+  .delete(customerController.deleteCustomer);
 
 module.exports = router;

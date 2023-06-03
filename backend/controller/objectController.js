@@ -1,43 +1,43 @@
-const Customer = require('../model/customerModel');
+const Object = require('../model/objectModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
-exports.getAllCustomers = catchAsync(async (req, res, next) => {
-  const customers = await Customer.findAll();
+exports.getAllObjects = catchAsync(async (req, res, next) => {
+  const objects = await Object.findAll();
 
   res.status(200).json({
     status: 'success',
-    results: customers.length,
-    data: { customers: customers },
+    results: objects.length,
+    data: { objects: objects },
   });
 });
 
-exports.getCustomer = catchAsync(async (req, res, next) => {
+exports.getObject = catchAsync(async (req, res, next) => {
   const id = req.params.id;
-  const customers = await Customer.findById(id);
+  const objects = await Object.findById(id);
 
   res.status(200).json({
     status: 'success',
-    results: customers.length,
-    data: { customers: customers },
+    results: objects.length,
+    data: { objects: objects },
   });
 });
 
-exports.createCustomer = (req, res) => {
+exports.createObject = (req, res) => {
   res.status(500).json({
     status: 'error',
     message: 'Route not yet defined!',
   });
 };
 
-exports.updateCustomer = (req, res) => {
+exports.updateObject = (req, res) => {
   res.status(500).json({
     status: 'error',
     message: 'Route not yet defined!',
   });
 };
 
-exports.deleteCustomer = (req, res) => {
+exports.deleteObject = (req, res) => {
   res.status(500).json({
     status: 'error',
     message: 'Route not yet defined!',
