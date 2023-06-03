@@ -1,0 +1,24 @@
+[
+    {
+        "id": 1,
+        "username": "kraft123",
+        "password": 123,
+        "firstName": "Milutin",
+        "lastName": "Milankovic",
+        "gender": "M",
+        "birthDate": "02/12/1999",
+        "role": "manager",
+        "store": 2
+    },
+    {
+        "id": 2,
+        "username": "stefke",
+        "password": 123,
+        "firstName": "Stefan",
+        "lastName": "Mokranjac",
+        "gender": "M",
+        "birthDate": "02/07/1890",
+        "role": "manager",
+        "store": 1
+    }
+]

@@ -1,0 +1,42 @@
+[
+    {
+      "id": 1,
+      "name": "Ren Car Rentals",
+      "available_vehicles": [1],
+      "working_hours": "9:00 AM - 6:00 PM",
+      "open": true,
+      "location": 1,
+      "logo": "https://example.com/ren-car-rentals-logo.jpg",
+      "rating": 4.5
+    },
+    {
+      "id": 2,
+      "name": "RenCar2Go",
+      "available_vehicles": [2],
+      "working_hours": "8:00 AM - 8:00 PM",
+      "open": true,
+      "location": 2,
+      "logo": "https://example.com/rencar2go-logo.jpg",
+      "rating": 4.2
+    },
+    {
+      "id": 3,
+      "name": "Ren Auto Rentals",
+      "available_vehicles": [3],
+      "working_hours": "7:00 AM - 7:00 PM",
+      "open": false,
+      "location": 3,
+      "logo": "https://example.com/ren-auto-rentals-logo.jpg",
+      "rating": 4.0
+    },
+    {
+      "id": 4,
+      "name": "Ren Wheels",
+      "available_vehicles": [4],
+      "working_hours": "10:00 AM - 5:00 PM",
+      "open": true,
+      "location": 4,
+      "logo": "https://example.com/ren-wheels-logo.jpg",
+      "rating": 4.8
+    }
+  ]
