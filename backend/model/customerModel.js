@@ -27,9 +27,10 @@ const create = function(customer){
 const checkValidity = function(params){
   const {username, password} = params;
 
+  console.log(username, password);
   return new Promise((resolve, reject) => {
     customers.forEach(customer => {
-      if(customer.username === username && customer.password===password){
+      if(customer.username === username && customer.password === password){
         resolve(customer);
       }
     });

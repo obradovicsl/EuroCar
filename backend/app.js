@@ -6,8 +6,11 @@ const customerRoutes = require('./routes/customerRoutes');
 const objectRoutes = require('./routes/objectRoutes');
 const globalErrorHandler = require('./controller/errorController');
 const AppError = require('./utils/appError');
+const cors = require('cors');
 
 const app = express();
+
+app.use(cors());
 
 //Set security HTTP headers
 app.use(helmet());
