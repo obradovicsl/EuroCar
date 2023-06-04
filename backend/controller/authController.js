@@ -1,5 +1,7 @@
 const AppError = require('../utils/appError');
 const Customer = require('./../model/customerModel');
+const Admin = require('./../model/adminModel');
+const Manager = require('./../model/managerModel');
 const catchAsync = require('./../utils/catchAsync');
 const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
@@ -61,12 +63,25 @@ exports.login = catchAsync(async (req, res, next) => {
 
   //Provera da li su username i sifra validni
   const customer = await Customer.checkValidity({username, password});
+  console.log(customer);
+  if(customer){
+    createSendToken(customer, 200, res);
+  }
 
-  if (!customer) {
+  const admin = await Admin.checkValidity({username, password});
+  if(admin){
+    createSendToken(admin, 200, res);
+  }
+
+  const manager = await Manager.checkValidity({username, password});
+  if(manager){
+    createSendToken(manager, 200, res);
+  }
+
+  if (!customer && !admin && !manager) {
     return next(new AppError('Incorrect username or password', 401));
   }
   //Kreiramo i saljemo web token
-  createSendToken(customer, 200, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -89,13 +104,31 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   // Proveravamo da li korisnik i dalje postoji
   const freshCustomer = await Customer.findById(decoded.id);
-  if (!freshCustomer) {
-    return next(new AppError('The user does not no longer exist', 401));
+  if(freshCustomer)
+  {
+    //Dozvoljen pristup protected ruti
+    req.customer = freshCustomer;
+    next();
+  }
+  const freshAdmin = await Admin.findById(decoded.id);
+  if(freshAdmin)
+  {
+    //Dozvoljen pristup protected ruti
+    req.admin = freshAdmin;
+    next();
   }
 
-  //Dozvoljen pristup protected ruti
-  req.customer = freshCustomer;
-  next();
+  const freshManager = await Manager.findById(decoded.id);
+  if(freshManager)
+  {
+    //Dozvoljen pristup protected ruti
+    req.manager = freshManager;
+    next();
+  }
+
+  if (!freshCustomer && !freshAdmin && !freshManager) {
+    return next(new AppError('The user does not no longer exist', 401));
+  }
 });
 
 

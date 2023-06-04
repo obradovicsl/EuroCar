@@ -64,22 +64,24 @@ export default {
     },
     methods:{
         async fetchCustomers(){
-            console.log('eee');
             const res = await fetch(`http://127.0.0.1:3000/api/v1/customers/${this.id}`);
             const data = await res.json();
             this.user = data.data.customers;
         },
-        fetchAdmins(){
-
+       async fetchAdmins(){
+            const res = await fetch(`http://127.0.0.1:3000/api/v1/admins/${this.id}`);
+            const data = await res.json();
+            this.user = data.data.admins;
         },
-        fetchManagers(){
-
+        async fetchManagers(){
+            const res = await fetch(`http://127.0.0.1:3000/api/v1/managers/${this.id}`);
+            const data = await res.json();
+            this.user = data.data.managers;
         },
         async updateProfile(){
-            console.log('EEEEEE');
             try{
                 let token = localStorage.getItem('user');
-                let response = await fetch('http://127.0.0.1:3000/api/v1/customers/updateMe',{
+                let response = await fetch(`http://127.0.0.1:3000/api/v1/${this.user.role}s/updateMe`,{
                     method: 'PATCH',
                     headers: {
                      "Content-Type": "application/json",

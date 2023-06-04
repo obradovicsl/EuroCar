@@ -34,16 +34,19 @@ export default {
     },
     methods:{
         async fetchCustomers(){
-            console.log('eee');
             const res = await fetch(`http://127.0.0.1:3000/api/v1/customers/${this.id}`);
             const data = await res.json();
             this.user = data.data.customers;
         },
-        fetchAdmins(){
-
+        async fetchAdmins(){
+            const res = await fetch(`http://127.0.0.1:3000/api/v1/admins/${this.id}`);
+            const data = await res.json();
+            this.user = data.data.admins;
         },
-        fetchManagers(){
-
+        async fetchManagers(){
+            const res = await fetch(`http://127.0.0.1:3000/api/v1/managers/${this.id}`);
+            const data = await res.json();
+            this.user = data.data.managers;
         },
         updateProfile(){
              this.$router.push({name: 'updateProfile', params: {id: this.user.id}});
