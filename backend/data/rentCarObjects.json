@@ -4,9 +4,9 @@
       "name": "Ren Car Rentals",
       "available_vehicles": [1],
       "working_hours": "9:00 AM - 6:00 PM",
-      "open": true,
-      "location": 1,
-      "logo": "https://example.com/ren-car-rentals-logo.jpg",
+      "open": false,
+      "location": "Knez Mihailova 6, Beograd, 11000",
+      "logo": "https://img.freepik.com/free-vector/gradient-car-dealer-logo-template_23-2149343860.jpg?w=740&t=st=1685879872~exp=1685880472~hmac=6eaabb585577a55dd6b1fd664438f57a378ddd9ada817e143061cafd6d4da1be",
       "rating": 4.5
     },
     {
@@ -15,8 +15,8 @@
       "available_vehicles": [2],
       "working_hours": "8:00 AM - 8:00 PM",
       "open": true,
-      "location": 2,
-      "logo": "https://example.com/rencar2go-logo.jpg",
+      "location": "Times Square, New York, NY 10036",
+      "logo": "https://img.freepik.com/free-vector/gradient-car-service-logo-template_23-2149727267.jpg?w=740&t=st=1685879887~exp=1685880487~hmac=f1b64b655f60acd7b7c0b6f5f83b5c7996597cf87123880a0f325822dfa16212",
       "rating": 4.2
     },
     {
@@ -25,8 +25,8 @@
       "available_vehicles": [3],
       "working_hours": "7:00 AM - 7:00 PM",
       "open": false,
-      "location": 3,
-      "logo": "https://example.com/ren-auto-rentals-logo.jpg",
+      "location": "Buckingham Palace, London, SW1A 1AA",
+      "logo": "https://img.freepik.com/free-vector/gradient-detailing-logo-template_23-2149343863.jpg?w=740&t=st=1685879896~exp=1685880496~hmac=2680540cec60545c9a6481892871331f80370377e6af22a6cf956ea54b64a5a3",
       "rating": 4.0
     },
     {
@@ -35,8 +35,8 @@
       "available_vehicles": [4],
       "working_hours": "10:00 AM - 5:00 PM",
       "open": true,
-      "location": 4,
-      "logo": "https://example.com/ren-wheels-logo.jpg",
+      "location": "Tokyo Tower, Minato City, Tokyo 105-0011",
+      "logo": "https://img.freepik.com/free-vector/gradient-car-service-logo-template_23-2149727261.jpg?w=740&t=st=1685879907~exp=1685880507~hmac=dd41b52200d4b6c9f863640488eae1da9b6e58749064224245a626f3f37403ba",
       "rating": 4.8
     }
   ]

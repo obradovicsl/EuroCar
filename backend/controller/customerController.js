@@ -18,8 +18,29 @@ exports.getCustomer = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    results: customers.length,
+    results: customers?.length,
     data: { customers: customers },
+  });
+});
+
+exports.updateMe = catchAsync(async (req, res, next) => {
+  // 1) Create error if user POSTs password data
+  if (req.body.password || req.body.passwordConfirm) {
+    return next(
+      new AppError(
+        'This route is not for password updates. Please use /updateMyPassword.',
+        400
+      )
+    );
+  }
+  // 2) Update user document
+  const updatedCustomer = await Customer.findByIdAndUpdate(req.customer.id, req.body);
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      user: updatedCustomer
+    }
   });
 });
 

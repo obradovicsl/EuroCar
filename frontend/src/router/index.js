@@ -1,5 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import ProfileView from '../views/profile/ProfileView.vue'
+import UpdateProfileView from '../views/profile/UpdateProfileView.vue'
 import LoginView from '../views/auth/LoginView.vue'
 import RegisterView from '../views/auth/RegisterView.vue'
 import NotFound from '../views/auth/NotFound.vue'
@@ -25,6 +27,16 @@ const routes = [
     path: '/successful',
     name: 'successful',
     component: SuccessfulRegistration
+  },
+  {
+    path: '/profile/:id',
+    name: 'profile',
+    component: ProfileView
+  },
+  {
+    path: '/updateProfile/:id',
+    name: 'updateProfile',
+    component: UpdateProfileView
   },
   {
     path: '/:catchAll(.*)',

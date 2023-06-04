@@ -59,17 +59,14 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError('Please provide username and password', 400));
   }
 
-  console.log("eee");
   //Provera da li su username i sifra validni
-  const user = await Customer.checkValidity({username, password});
-  console.log("eee");
+  const customer = await Customer.checkValidity({username, password});
 
-  if (!user) {
+  if (!customer) {
     return next(new AppError('Incorrect username or password', 401));
   }
-
   //Kreiramo i saljemo web token
-  createSendToken(user, 200, res);
+  createSendToken(customer, 200, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -91,13 +88,13 @@ exports.protect = catchAsync(async (req, res, next) => {
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
   // Proveravamo da li korisnik i dalje postoji
-  const freshUser = await User.findById(decoded.id);
-  if (!freshUser) {
+  const freshCustomer = await Customer.findById(decoded.id);
+  if (!freshCustomer) {
     return next(new AppError('The user does not no longer exist', 401));
   }
 
   //Dozvoljen pristup protected ruti
-  req.user = freshUser;
+  req.customer = freshCustomer;
   next();
 });
 

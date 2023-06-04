@@ -1,4 +1,4 @@
-const customers = require('../data/customers.json');
+let customers = require('../data/customers.json');
 const { v4: uuidv4 } = require('uuid')
 const { writeDataToFile } = require('../utils/files')
 
@@ -40,10 +40,32 @@ const checkValidity = function(params){
   })
 }
 
+const findByIdAndUpdate = function(id, body){
+
+  return new Promise((resolve, reject) => {
+    console.log(body);
+    const customer = customers.find(c => c.id == id)
+    if(!customer) reject({message: 'customer does not exist!'});
+    let newCustomer = {...customer};
+
+    for (const [key, value] of Object.entries(body)) {
+      newCustomer[key] = value;
+    }
+
+    customers = customers.filter(customer => {
+     return customer.id != newCustomer.id
+    });
+    customers.push(newCustomer);
+    writeDataToFile('./data/customers.json', customers);
+    resolve(newCustomer);
+  });
+}
+
 module.exports = {
   findAll,
   findById,
   create,
+  findByIdAndUpdate,
   checkValidity
 }
 

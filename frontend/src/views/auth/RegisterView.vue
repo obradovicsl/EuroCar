@@ -87,7 +87,9 @@ export default {
                 }else{
                     this.error = false;
                     localStorage.setItem("user", data.token);
-                   this.$root.isLoged = true;
+                    this.$root.isLoged = true;
+                    this.$root.loggedUser = data.data.user;
+                    this.$root.userRole = data.data.user.role;
                     this.$router.push({name: 'successful'});
                 }
             }catch(err)
