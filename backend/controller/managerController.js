@@ -46,23 +46,19 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getAvailableManagers  = catchAsync(async (req, res, next) => {
-  const allManagers = await Manager.findAll();
-  const availableManagers = new Array();
-
-  for(const manager of allManagers)
-  {
-    if(manager.storeId == '') availableManagers.push(manager);
-  }
-
-  console.log(availableManagers);
-  
-  res.status(200).json({
-    status: 'success',
-    results: availableManagers.length,
-    data: { availableManagers: availableManagers },
+exports.createManager = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'Route not yet defined!',
   });
-});
+};
+
+exports.updateManager = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'Route not yet defined!',
+  });
+};
 
 exports.deleteManager = (req, res) => {
   res.status(500).json({

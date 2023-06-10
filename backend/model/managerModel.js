@@ -57,7 +57,6 @@ const findByIdAndUpdate = function(id, body){
   });
 }
 
-
 module.exports = {
   findAll,
   findById,

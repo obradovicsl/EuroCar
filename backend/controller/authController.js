@@ -81,6 +81,7 @@ exports.login = catchAsync(async (req, res, next) => {
   if (!customer && !admin && !manager) {
     return next(new AppError('Incorrect username or password', 401));
   }
+  //Kreiramo i saljemo web token
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -109,7 +110,6 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.customer = freshCustomer;
     next();
   }
-
   const freshAdmin = await Admin.findById(decoded.id);
   if(freshAdmin)
   {
@@ -132,13 +132,10 @@ exports.protect = catchAsync(async (req, res, next) => {
 });
 
 
-
 //Kasnije ce biti potrebno, kako bi zastitili endpointe za administratora/menadzera/kupca
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
-    const loggedUser = req.customer || req.manager || req.admin;
-
-    if (!roles.includes(loggedUser.role)) {
+    if (!roles.includes(req.user.role)) {
       return next(
         new AppError(
           'You do not have a permission to perform this action!',

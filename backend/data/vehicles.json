@@ -1,11 +1,11 @@
 [
     {
-      "id": "aaae2daa-b9c9-4a46-a917-5b29fd630370",
+      "id": 1,
       "brand": "Renault",
       "model": "Clio",
       "price": 50,
       "type": "Car",
-      "rentCarObjectId": "573e2daa-b9c9-4a46-a917-5b29fd630370",
+      "rentCarObject": [1],
       "transmission": "Manual",
       "fuel_type": "Petrol",
       "consumption": 6.5,
@@ -16,12 +16,12 @@
       "available": true
     },
     {
-      "id": "573e2de2-b9a9-4a46-a117-5b29fd630370",
+      "id": 2,
       "brand": "Renault",
       "model": "Kangoo",
       "price": 70,
       "type": "Van",
-      "rentCarObjectId": "573e2daa-b9c9-4a46-a917-5b29fd630370",
+      "rentCarObject": [2],
       "transmission": "Manual",
       "fuel_type": "Diesel",
       "consumption": 7.2,
@@ -32,12 +32,12 @@
       "available": true
     },
     {
-      "id": "573e2de2-f9a9-4146-a117-aa29fd630370",
+      "id": 3,
       "brand": "Renault",
       "model": "Captur",
       "price": 60,
       "type": "Car",
-      "rentCarObjectId": "573e2dcc-b9c9-4a46-a977-5b29fd630111",
+      "rentCarObject": [3],
       "transmission": "Automatic",
       "fuel_type": "Petrol",
       "consumption": 5.8,
@@ -48,12 +48,12 @@
       "available": false
     },
     {
-      "id": "573e2dcc-b9c9-4f46-a977-5b29fd630afe",
+      "id": 4,
       "brand": "Renault",
       "model": "Trafic",
       "price": 80,
       "type": "Van",
-      "rentCarObjectId": "573e2dcc-b9c9-4a46-a977-5b29fd630111",
+      "rentCarObject": [4],
       "transmission": "Manual",
       "fuel_type": "Diesel",
       "consumption": 8.0,
