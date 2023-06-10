@@ -1,4 +1,5 @@
 const Customer = require('../model/customerModel');
+const Rental = require('../model/rentalModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
@@ -14,12 +15,21 @@ exports.getAllCustomers = catchAsync(async (req, res, next) => {
 
 exports.getCustomer = catchAsync(async (req, res, next) => {
   const id = req.params.id;
-  const customers = await Customer.findById(id);
+  const customer = await Customer.findById(id);
+
+  const rentals = new Array();
+  for(const rentId of customer.rentalsIds){
+    const rental = await Rental.findById(rentId);
+    rental && rentals.push(rental);
+  }
+  
+  delete customer.rentalsIds;
+  customer.rentals = rentals;
 
   res.status(200).json({
     status: 'success',
-    results: customers?.length,
-    data: { customers: customers },
+    results: customer?.length,
+    data: { customer: customer },
   });
 });
 
@@ -43,20 +53,6 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     }
   });
 });
-
-exports.createCustomer = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'Route not yet defined!',
-  });
-};
-
-exports.updateCustomer = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'Route not yet defined!',
-  });
-};
 
 exports.deleteCustomer = (req, res) => {
   res.status(500).json({

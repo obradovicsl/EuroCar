@@ -11,13 +11,10 @@ router.patch('/updateMe', authController.protect, customerController.updateMe);
 
 router
   .route('/')
-  .get(customerController.getAllCustomers)
-  .post(customerController.createCustomer);
+  .get(customerController.getAllCustomers);
   
 router
   .route('/:id')
   .get(customerController.getCustomer)
-  .patch(customerController.updateCustomer)
-  .delete(customerController.deleteCustomer);
 
 module.exports = router;

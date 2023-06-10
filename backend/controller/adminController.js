@@ -1,6 +1,8 @@
-const Admin = require('../model/adminModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const Admin = require('../model/adminModel');
+const Manager = require('../model/managerModel');
+const Object = require('../model/objectModel');
 
 exports.getAllAdmins = catchAsync(async (req, res, next) => {
   const admins = await Admin.findAll();
@@ -44,19 +46,63 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.createAdmin = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'Route not yet defined!',
-  });
-};
+exports.createManager = catchAsync( async (req, res, next) => {
+  const manager = {
+    username: req.body.username,
+    password: req.body.password,
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    gender: req.body.gender,
+    birthDate: req.body.birthDate,
+    role: "manager",
+    store: {},
+  }
 
-exports.updateAdmin = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'Route not yet defined!',
+  const newManager = await Manager.create(manager);
+
+  res.status(201).json({
+    status: 'success',
+    data: {
+      newManager
+    }
   });
-};
+});
+
+exports.createObject = catchAsync( async (req, res, next) => {
+  let manager = Manager.findById(req.body.managerId);
+
+  if(!manager || manager.storeId != '')  return next(
+    new AppError(
+      'Manager does not exist or he is already a store owner',
+      404
+    )
+  );
+
+  const object = {
+    name: req.body.name,
+    workingHours: req.body.workingHours,
+    locationId: req.body.locationId,
+    logo: req.body.logo,
+    managerId: req.body.managerId,
+    vehiclesIds: [],
+    rating: 0,
+    open: false,
+  }
+
+  const newObject = await Object.create(object);
+  
+   manager = await Manager.findByIdAndUpdate(req.body.managerId, {
+    storeId: newObject.id
+  });
+
+  res.status(201).json({
+    status: 'success',
+    data: {
+      newObject
+    }
+  });
+});
+
 
 exports.deleteAdmin = (req, res) => {
   res.status(500).json({
