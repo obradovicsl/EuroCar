@@ -1,0 +1,22 @@
+[
+    {
+        "id": "39312daf-b9c9-4a46-a977-5b29fd630111",
+        "rentedVehiclesIds": ["aaae2daa-b9c9-4a46-a917-5b29fd630370"],
+        "rentalCompanyId": "573e2daa-b9c9-4a46-a917-5b29fd630370",
+        "rentalDateTime": "2023-06-01T09:00:00",
+        "rentalDuration": "3 days",
+        "price": 150.00,
+        "customerId": "7ff2d1f8-2018-47d9-ba5e-3416566f286d",
+        "status": "RETURNED"
+      },
+      {
+        "id": "10212daf-bfc9-4b46-a977-5b29fd630111",
+        "rentedVehiclesIds": ["573e2de2-f9a9-4146-a117-aa29fd630370"],
+        "rentalCompanyId": "573e2dcc-b9c9-4a46-a977-5b29fd630111",
+        "rentalDateTime": "2023-06-02T14:30:00",
+        "rentalDuration": "1 week",
+        "price": 400.00,
+        "customerId": "577bdb41-32cf-4983-9fba-42d320426175",
+        "status": "RETURNED"
+      }
+]
