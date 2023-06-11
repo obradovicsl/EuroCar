@@ -55,7 +55,7 @@ exports.createManager = catchAsync( async (req, res, next) => {
     gender: req.body.gender,
     birthDate: req.body.birthDate,
     role: "manager",
-    store: {},
+    storeId: "",
   }
 
   const newManager = await Manager.create(manager);

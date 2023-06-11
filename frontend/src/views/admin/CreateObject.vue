@@ -1,147 +1,137 @@
 <template>
- <section class="vh-90 gradient-custom">
-    <div class="container py-5 h-90">
-      <div class="row d-flex justify-content-center align-items-center h-90">
-        <div class="col-12 col-md-8 col-lg-6 col-xl-5">
-          <div class="card bg-dark text-white" style="border-radius: 1rem">
-            <div class="card-body p-5 text-center">
-              <div class="mb-md-3 mt-md-1 pb-5">
-                <h2 class="fw-bold mb-2 text-uppercase mb-4">
-                  Create Rent A Car Object
-                </h2>
+<div class="container">
 
-                <form @submit.prevent="register">
-                  <div class="form-outline form-white mb-4">
-                    <input
-                      type="text"
-                      id="typeEmailX"
-                      class="form-control form-control-sm"
-                      required
-                      v-model="firstName"
-                    />
-                    <label class="form-label" for="typeEmailX"
-                      >First Name</label
-                    >
-                  </div>
-                  <div class="form-outline form-white mb-4">
-                    <input
-                      type="text"
-                      id="typeEmailX"
-                      class="form-control form-control-sm"
-                      required
-                      v-model="lastName"
-                    />
-                    <label class="form-label" for="typeEmailX">Last Name</label>
-                  </div>
-                  <div class="form-outline form-white mb-4">
-                    <input
-                      type="text"
-                      id="typeEmailX"
-                      class="form-control form-control-sm"
-                      required
-                      v-model="username"
-                    />
-                    <label class="form-label" for="typeEmailX">Username</label>
-                  </div>
+    <form>
+      <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <input type="text" class="form-control" id="name" v-model="name">
+      </div>
 
-                  <div class="form-outline form-white mb-4">
-                    <input
-                      type="password"
-                      id="typePasswordX"
-                      class="form-control form-control-sm"
-                      required
-                      v-model="password"
-                    />
-                    <label class="form-label" for="typePasswordX"
-                      >Password</label
-                    >
-                  </div>
-                  <div class="form-outline form-white mb-4">
-                    <input
-                      type="password"
-                      id="typePasswordX"
-                      class="form-control form-control-sm"
-                      required
-                      v-model="confirmPassword"
-                    />
-                    <label class="form-label" for="typePasswordX"
-                      >Confirm Password</label
-                    >
-                  </div>
-
-                  <div class="form-outline form-white mb-4">
-                    <select
-                      class="form-select form-select-sm"
-                      aria-label=".form-select-sm example"
-                      v-model="gender"
-                    >
-                      <option selected value="M">M</option>
-                      <option value="F">F</option>
-                    </select>
-                    <label class="form-label" for="typePasswordX">Gender</label>
-                  </div>
-
-                  <div class="form-outline form-white mb-4">
-                    <input
-                      type="date"
-                      v-model="birthDate"
-                      class="form-control form-control-sm"
-                    />
-                    <label class="form-label" for="typePasswordX"
-                      >BirthDate</label
-                    >
-                  </div>
-
-                  <button
-                    class="btn btn-outline-light btn-sm px-5"
-                    type="submit"
-                  >
-                    Create
-                  </button>
-
-                  <p v-if="error" class="error">Wrong username or password</p>
-                </form>
-              </div>
-            </div>
+      <div class="mb-3">
+        <label for="workingHours" class="form-label">Working hours</label>
+        <div class="row">
+          <div class="col">
+            <input type="text" class="form-control" placeholder="Open at" v-model="openAt">
+          </div>
+          <div class="col">
+            <input type="text" class="form-control" placeholder="Closed at" v-model="closedAt">
           </div>
         </div>
       </div>
-    </div>
-  </section>
+
+      <div class="mb-3">
+        <label for="location" class="form-label">Location</label>
+        <input type="text" class="form-control mb-4" id="location" v-model="address">
+
+        <div style="height:400px; width:1200px container">
+          <l-map ref="map" :zoom="zoom" :center="[47.41322, -1.219482]" @ready="doSomethingOnReady">
+            <l-tile-layer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              layer-type="base"
+              name="OpenStreetMap"
+            ></l-tile-layer>
+             <l-marker
+                :lat-lng="markerLatLng"
+                ref="marker"
+                v-if="markerLatLng"
+              ></l-marker>
+          </l-map>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="manager" class="form-label">Manager</label>
+        <select class="form-select" id="manager" v-model="selectedManager" v-if="availableManagers.length != 0">
+          <option v-for="manager in availableManagers" :key="manager.id" :value="manager.id">{{ manager.firstName }}</option>
+        </select>
+        <div v-if="availableManagers.length == 0">
+        <p>THERE IS NO AWAILABLE MANAGERS!</p>
+        <button @click="createManagerHandle">CREATE ONE</button>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
 </template>
 
 <script>
+
 export default {
-     data(){
-        return{
-            firstName: '',
-            lastName: '',
-            gender: 'M',
-            birthDate: '',
-            username: '',
-            password: '',
-            confirmPassword: '',
-            error: false,
-            availableManagers: [],
-        }
+
+  data() {
+    return {
+      zoom: 13,
+      latitude: null,
+      longitude: null,
+      address: '',
+      markerLatLng: [12, 13],
+      availableManagers: [],
+      selectedManager: {},
+    };
+  },
+  methods:{
+    getCurrentCoordinates() {
+    return new Promise(function(resolve, reject) {
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+          var latitude = position.coords.latitude;
+          var longitude = position.coords.longitude;
+          resolve({ latitude, longitude });
+        }, function(error) {
+          reject(error);
+        });
+      } else {
+        reject(new Error("Geolokacija nije podržana u browseru."));
+      }
+    });
+   },
+    doSomethingOnReady() {
+        this.map = this.$refs.map.leafletObject;
+        this.map.panTo([this.latitude, this.longitude]);
+
+        this.map.on('click', async function(e) {
+        var clickedLatLng = e.latlng;
+        this.markerLatLng = clickedLatLng;
+
+        var apiUrl = 'https://nominatim.openstreetmap.org/reverse?format=json&lat=' + clickedLatLng.lat + '&lon=' + clickedLatLng.lng;
+
+        const data = await fetch(apiUrl);
+        const res = await data.json();
+        console.log(res.address);
+        this.address = `${res.address.road} ${res.address.house_number || ''} ${res.address.city}`;
+      });
     },
-    methods:{
-        async register(){
-        }
+    mapClickHandler(event){
+      console.log(event);
+    },
+    createManagerHandle(){
+      this.$router.push({name: 'createManager'});
     }
+  },
+  async mounted(){
+    const res = await this.getCurrentCoordinates();
+    this.latitude = res.latitude;
+    this.longitude = res.longitude;
+
+    let token = localStorage.getItem('user');
+    const response = await fetch('http://127.0.0.1:3000/api/v1/managers/available', {
+                    method: 'GET',
+                    headers: {
+                     "Content-Type": "application/json",
+                     "Authorization": `Bearer ${token}`,
+                    }
+                  });
+      const data = await response.json();
+      this.availableManagers = data.data.availableManagers;
+  }
+    
 }
 </script>
 
 <style>
-
-    .error{
-        color: red;
-    }
-    .btn_signup{
-        background: none;
-        border: none;
-        text-transform: uppercase;
-        cursor: pointer;
-        color: #0b7285;
-    }
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+}
 </style>
