@@ -3,42 +3,61 @@ const Location = require('../model/locationModel');
 const Vehicle = require('../model/vehicleModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const Initialize = require('../utils/initialize');
+const Filter = require('../utils/filter');
 
 exports.getAllObjects = catchAsync(async (req, res, next) => {
   const objects = await Object.findAll();
+  const newObjects = new Array();
 
   for(let obj of objects){ 
-    const location = await Location.findById(obj.locationId);
-    obj.address = location.address;
-    delete obj.locationId;
+    obj = await Initialize.initializeObject(obj);
+    newObjects.push(obj);
   }
 
   res.status(200).json({
     status: 'success',
     results: objects.length,
-    data: { objects: objects },
+    data: { objects: newObjects },
   });
 });
 
 exports.getObject = catchAsync(async (req, res, next) => {
   const id = req.params.id;
-  const object = await Object.findById(id);
+  let object = await Object.findById(id);
 
-  const location = await Location.findById(object.locationId);
-  object.address = location?.address;
-  delete object.locationId;
-  const vehicles = new Array();
-  for(const vehId of object.vehiclesIds){
-    const vehicle = await Vehicle.findById(vehId);
-    vehicle && vehicles.push(vehicle);
-  }
-  delete object.vehiclesIds;
-  object.vehicles = vehicles;
+  object = await Initialize.initializeObject(object);
 
   res.status(200).json({
     status: 'success',
     results: object.length,
-    data: { object: object },
+    data: { object },
+  });
+});
+
+exports.findObject = catchAsync(async (req, res, next) => {
+  const o = await Object.findAll();
+  let objects = new Array();
+
+  for(let obj of o){ 
+    obj = await Initialize.initializeObject(obj);
+    objects.push(obj);
+  }
+
+  const name = req.query.name;
+  const vehicleType = req.query.vehicleType;
+  const address = req.query.address;
+  const rating = req.query.rating;
+
+  if(name) objects = Filter.filterByName(objects, name);
+  if(vehicleType) objects = Filter.filterByVehType(objects,vehicleType);
+  if(address) objects = Filter.filterByAddress(objects, address);
+  if(rating) objects = Filter.filterByRating(objects, rating);
+
+  res.status(200).json({
+    status: 'success',
+    results: objects.length,
+    data: { objects: objects },
   });
 });
 

@@ -96,7 +96,6 @@ export default {
                     }),
                 });
                  let data = await response.json();
-                console.log(data);
                 if(data.status != 'success'){
                     this.error = true;
                     this.errorMessage = data.message;
@@ -112,7 +111,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
     .register{
         width: 30vw;
         height: 60vh;

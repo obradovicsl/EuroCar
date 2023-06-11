@@ -29,9 +29,6 @@ const checkValidity = function(params){
 
   return new Promise((resolve, reject) => {
     customers.forEach(customer => {
-      console.log(customer.username, username);
-      console.log(customer.password, password);
-      
       if(customer.username == username && customer.password == password){
         resolve(customer);
       }
@@ -43,7 +40,6 @@ const checkValidity = function(params){
 const findByIdAndUpdate = function(id, body){
 
   return new Promise((resolve, reject) => {
-    console.log(body);
     const customer = customers.find(c => c.id == id)
     if(!customer) reject({message: 'customer does not exist!'});
     let newCustomer = {...customer};

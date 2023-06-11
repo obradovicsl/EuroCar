@@ -3,11 +3,16 @@ const objectController = require('../controller/objectController');
 const router = express.Router();
 
 router
+  .route('/search')
+  .get(objectController.findObject);
+
+
+  router
   .route('/')
-  .get(objectController.getAllObjects)
+  .get(objectController.getAllObjects);
   
 router
   .route('/:id')
-  .get(objectController.getObject)
+  .get(objectController.getObject);
 
 module.exports = router;

@@ -1,5 +1,5 @@
 <template>
-  <section class="vh-90 gradient-custom">
+ <section class="vh-90 gradient-custom">
     <div class="container py-5 h-90">
       <div class="row d-flex justify-content-center align-items-center h-90">
         <div class="col-12 col-md-8 col-lg-6 col-xl-5">
@@ -7,7 +7,7 @@
             <div class="card-body p-5 text-center">
               <div class="mb-md-3 mt-md-1 pb-5">
                 <h2 class="fw-bold mb-2 text-uppercase mb-4">
-                  Create an account
+                  Create Rent A Car Object
                 </h2>
 
                 <form @submit.prevent="register">
@@ -96,7 +96,7 @@
                     class="btn btn-outline-light btn-sm px-5"
                     type="submit"
                   >
-                    Register
+                    Create
                   </button>
 
                   <p v-if="error" class="error">Wrong username or password</p>
@@ -112,77 +112,36 @@
 
 <script>
 export default {
-  data() {
-    return {
-      firstName: '',
-      lastName: '',
-      gender: 'M',
-      birthDate: '',
-      username: '',
-      password: '',
-      confirmPassword: '',
-      error: false,
-    };
-  },
-  methods: {
-    async register() {
-      try {
-        let response = await fetch(
-          'http://127.0.0.1:3000/api/v1/customers/signup',
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              username: this.username,
-              password: this.password,
-              firstName: this.firstName,
-              lastName: this.lastName,
-              gender: this.gender,
-              birthDate: this.birthDate,
-            }),
-          }
-        );
-        let data = await response.json();
-        console.log(data);
-        if (data.status != 'success') {
-          this.error = true;
-        } else {
-          this.error = false;
-          localStorage.setItem('user', data.token);
-          this.$root.isLoged = true;
-          this.$root.loggedUser = data.data.user;
-          this.$root.userRole = data.data.user.role;
-          this.$router.push({ name: 'successful' });
+     data(){
+        return{
+            firstName: '',
+            lastName: '',
+            gender: 'M',
+            birthDate: '',
+            username: '',
+            password: '',
+            confirmPassword: '',
+            error: false,
+            availableManagers: [],
         }
-      } catch (err) {}
     },
-  },
-};
+    methods:{
+        async register(){
+        }
+    }
+}
 </script>
 
-<style scoped>
-.btn_login {
-  width: 120px;
-  padding: 6px 10px;
-  border-radius: 10px;
-  background: #66d9e8;
-  color: #fff;
-  font-size: 16px;
-  border: none;
-  cursor: pointer;
-  margin-bottom: 10px;
-}
+<style>
 
-.error {
-  color: red;
-}
-.btn_signup {
-  background: none;
-  border: none;
-  text-transform: uppercase;
-  cursor: pointer;
-  color: #0b7285;
-}
+    .error{
+        color: red;
+    }
+    .btn_signup{
+        background: none;
+        border: none;
+        text-transform: uppercase;
+        cursor: pointer;
+        color: #0b7285;
+    }
 </style>

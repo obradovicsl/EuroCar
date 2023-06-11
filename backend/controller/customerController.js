@@ -2,6 +2,7 @@ const Customer = require('../model/customerModel');
 const Rental = require('../model/rentalModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const initialize = require('../utils/initialize');
 
 exports.getAllCustomers = catchAsync(async (req, res, next) => {
   const customers = await Customer.findAll();
@@ -16,20 +17,22 @@ exports.getAllCustomers = catchAsync(async (req, res, next) => {
 exports.getCustomer = catchAsync(async (req, res, next) => {
   const id = req.params.id;
   const customer = await Customer.findById(id);
-
+  const newCustomer = {...customer};
   const rentals = new Array();
-  for(const rentId of customer.rentalsIds){
+
+  for(const rentId of newCustomer.rentalsIds){
     const rental = await Rental.findById(rentId);
-    rental && rentals.push(rental);
+    const newRental =   await initialize.initializeRentals(rental);
+    rental && rentals.push(newRental);
   }
   
-  delete customer.rentalsIds;
-  customer.rentals = rentals;
+  delete newCustomer.rentalsIds;
+  newCustomer.rentals = rentals;
 
   res.status(200).json({
     status: 'success',
-    results: customer?.length,
-    data: { customer: customer },
+    results: newCustomer?.length,
+    data: { customers: newCustomer },
   });
 });
 

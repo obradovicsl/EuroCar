@@ -20,6 +20,7 @@ const createSendToken = (user, statusCode, res) => {
     expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
     httpOnly: true, //Cookiu ne moze pristupiti browser(ne moze ga ni menjati)
   };
+
   if(process.env.NODE_ENV === 'production') cookieOptions.secure = true;
 
   res.cookie('jwt', token, cookieOptions);
@@ -63,7 +64,6 @@ exports.login = catchAsync(async (req, res, next) => {
 
   //Provera da li su username i sifra validni
   const customer = await Customer.checkValidity({username, password});
-  console.log(customer);
   if(customer){
     createSendToken(customer, 200, res);
   }
@@ -130,8 +130,6 @@ exports.protect = catchAsync(async (req, res, next) => {
     return next(new AppError('The user does not no longer exist', 401));
   }
 });
-
-
 
 //Kasnije ce biti potrebno, kako bi zastitili endpointe za administratora/menadzera/kupca
 exports.restrictTo = (...roles) => {

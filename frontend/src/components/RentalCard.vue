@@ -1,36 +1,37 @@
 <template>
-  <div class="card">
-    <img :src="object.logo" alt="">
+   <div class="card">
     <div class="card-content">
-    <h2>{{this.object.name}}</h2>
-    <p>{{this.object.address}}</p>
-    <p>{{this.object.rating}}</p>
+    <h2>{{this.rent.object}}</h2>
+    <h2>{{this.rent.rentalDateTime}}</h2>
+    <h3>Rented vehicles: </h3>
+    <ul class="card-list" v-for="vehicle in rent.vehicles" :key="vehicle">
+        <li>{{vehicle}}</li>
+    </ul>
     </div>
   </div>
 </template>
 
 <script>
 export default {
-    props: ['object'],
+     props: ['rent'],
     data(){
         return {
             image: '',
             name: '',
-            address: '',
+            location: '',
             score: ''
         }
     },
     mounted(){
-        console.log(this.object);
+        console.log(this.rent);
     }
-
 }
 </script>
 
 <style scoped>
     .card{
-        display: flex;
-        flex-direction: column;
+        margin: 0 auto;
+        background: #ccc;
         width: 300px;
          box-shadow: 0 2.4rem 4.8rem rgba(0, 0, 0, 0.075);
         border-radius: 11px;
@@ -38,13 +39,12 @@ export default {
         transition: all 0.4s;
     }
 
-    .card img{
-        width: 100%;
-    }
-
     .card-content{
-        padding: 10px 16px 16px 16px;
+        padding: 16px;
         height: 180px;
     }
 
+    .card-list{
+        list-style: none;
+    }
 </style>

@@ -5,6 +5,8 @@ import UpdateProfileView from '../views/profile/UpdateProfileView.vue'
 import LoginView from '../views/auth/LoginView.vue'
 import RegisterView from '../views/auth/RegisterView.vue'
 import NotFound from '../views/auth/NotFound.vue'
+import CreateManager from '../views/admin/CreateManager.vue'
+import CreateObject from '../views/admin/CreateObject.vue'
 import SuccessfulRegistration from '../views/auth/SuccessfulRegistration.vue'
 
 const routes = [
@@ -37,6 +39,16 @@ const routes = [
     path: '/updateProfile/:id',
     name: 'updateProfile',
     component: UpdateProfileView
+  },
+  {
+    path: '/createManager',
+    name: 'createManager',
+    component: CreateManager
+  },
+  {
+    path: '/createObject',
+    name: 'createObject',
+    component: CreateObject
   },
   {
     path: '/:catchAll(.*)',

@@ -1,5 +1,5 @@
 <template>
-<div>
+<div class="profile">
   <p>First name: {{user.firstName}}</p>
   <p>Last name: {{user.lastName}}</p>
   <p>Username: {{user.username}}</p>
@@ -7,13 +7,25 @@
   <p>Birth date: {{user.birthDate}}</p>
   <p v-if="user.role == 'customer'">Points: {{user.points}}</p>
   <p v-if="user.role == 'customer'">Customer type: {{user.customerType}}</p>
-
   <button @click="updateProfile">Update Profile</button>
+
+  <div v-if="user.role == 'customer'"> 
+  <h2>Previous rentals:</h2>
+  <div class="rentals" v-for="rent in user.rentals" :key="rent.id">
+    <RentalCard :rent="rent"/>    
+  </div>
+  </div>
+
 </div>
 </template>
 
 <script>
+import RentalCard from '../../components/RentalCard';
+
 export default {
+    components: {
+        RentalCard
+    },
      data(){
         return{
             id: this.$route.params.id,
@@ -21,6 +33,7 @@ export default {
         }
     },
     async mounted(){
+        console.log(this.$root.userRole);
         if(this.$root.userRole == 'customer'){
             this.fetchCustomers();
         }
@@ -56,5 +69,10 @@ export default {
 </script>
 
 <style>
-
+    .profile{
+        text-align: center;
+    }
+    .rentals{
+        margin: 0 auto;
+    }
 </style>
