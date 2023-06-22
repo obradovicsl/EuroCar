@@ -63,8 +63,9 @@ exports.findObject = catchAsync(async (req, res, next) => {
 });
 
 exports.createObject = catchAsync( async (req, res, next) => {
-  let manager = User.findById(req.body.managerId);
-
+  console.log(req.body);
+  let manager = await User.findById(req.body.managerId);
+  console.log(manager);
   if(!manager || manager.storeId != '' || manager.role != 'manager')  return next(
     new AppError(
       'Manager does not exist or he is already a store owner',
@@ -75,7 +76,7 @@ exports.createObject = catchAsync( async (req, res, next) => {
   const object = {
     name: req.body.name,
     workingHours: req.body.workingHours,
-    locationId: req.body.locationId,
+    location: req.body.location,
     logo: req.body.logo,
     managerId: req.body.managerId,
     vehiclesIds: [],

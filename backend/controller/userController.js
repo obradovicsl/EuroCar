@@ -76,7 +76,8 @@ exports.createManager = catchAsync(async (req, res, next) => {
 
 exports.getAvailableManagers = catchAsync(async (req, res, next) => {
   const users = await User.findAll();
-  const allManagers = users.map((user) => user.role === 'manager');
+  const allManagers = users.filter((user) => user.role === 'manager');
+  console.log(allManagers);
 
   const availableManagers = new Array();
 

@@ -128,7 +128,7 @@ export default {
     async register() {
       try {
         let response = await fetch(
-          'http://127.0.0.1:3000/api/v1/customers/signup',
+          'http://127.0.0.1:3000/api/v1/users/signup',
           {
             method: 'POST',
             headers: {

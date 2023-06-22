@@ -61,7 +61,7 @@ export default {
         },
         async login(){
             try{
-                let response = await fetch('http://127.0.0.1:3000/api/v1/customers/login',{
+                let response = await fetch('http://127.0.0.1:3000/api/v1/users/login',{
                     method: 'POST',
                     headers: {
                      "Content-Type": "application/json",
@@ -80,7 +80,6 @@ export default {
                     console.log(data.data.user);
                     this.$root.isLoged = true;
                     this.$root.loggedUser = data.data.user;
-                    this.$root.userRole = data.data.user.role;
                     this.$router.push({name: 'home'});
                 }
             }catch(err)

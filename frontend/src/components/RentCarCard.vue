@@ -3,7 +3,7 @@
     <img :src="object.logo" alt="">
     <div class="card-content">
     <h2>{{this.object.name}}</h2>
-    <p>{{this.object.address}}</p>
+    <p>{{this.object.location.address}}</p>
     <p>{{this.object.rating}}</p>
     </div>
   </div>

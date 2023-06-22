@@ -17,6 +17,7 @@ router.get('/me', userController.getMe, userController.getUser);
 router.use(authController.restrictTo('admin'));
 
 router.get('/availableManagers', userController.getAvailableManagers);
+router.post('/createManager', userController.createManager);
 
 router
   .route('/')

@@ -1,47 +1,84 @@
 <template>
   <div>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="#">Navbar</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <router-link to="/" class="nav-link active">Objects</router-link>
-        </li>
-        <li class="nav-item">
-           <router-link class="nav-link"
-              :to="{ name: 'profile', params: { id: loggedUser.id } }"
-              v-if="isLoged">
-            My profile
-          </router-link>
-        </li>
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">Navbar</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <router-link to="/" class="nav-link active">Objects</router-link>
+            </li>
+            <li class="nav-item">
+              <router-link
+                class="nav-link"
+                :to="{ name: 'profile', params: { id: loggedUser.id } }"
+                v-if="isLoged"
+              >
+                My profile
+              </router-link>
+            </li>
 
-         <li class="nav-item dropdown" v-if="userRole=='admin' && isLoged">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Admin panel
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <li>  <router-link class="dropdown-item" :to="{ name: 'createObject'}" >
-                  Create Object
-              </router-link></li>
-            <li>  <router-link class="dropdown-item" :to="{ name: 'createManager'}" >
-                  Create Manager
-              </router-link></li>
+            <li
+              class="nav-item dropdown"
+              v-if="loggedUser.role == 'admin' && isLoged"
+            >
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="navbarDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Admin panel
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <li>
+                  <router-link
+                    class="dropdown-item"
+                    :to="{ name: 'createObject' }"
+                  >
+                    Create Object
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    class="dropdown-item"
+                    :to="{ name: 'createManager' }"
+                  >
+                    Create Manager
+                  </router-link>
+                </li>
+              </ul>
+            </li>
+
+            <li class="nav-item">
+              <router-link
+                class="nav-link"
+                :to="{ name: 'login' }"
+                v-if="!isLoged"
+                >Login</router-link
+              >
+            </li>
+
+            <button v-if="isLoged" class="btn btn-primary" @click="logout">
+              Logout
+            </button>
           </ul>
-        </li>
-
-        <li class="nav-item">
-          <router-link class="nav-link" :to="{ name: 'login' }" v-if="!isLoged">Login</router-link>
-        </li>
-
-        <button v-if="isLoged" class="btn btn-primary" @click="logout">Logout</button>
-      </ul>
-    </div>
-  </div>
-</nav>
+        </div>
+      </div>
+    </nav>
     <router-view />
   </div>
 </template>
@@ -65,12 +102,18 @@ export default {
   async mounted() {
     document.title = 'Rent A Car';
     const token = localStorage.getItem('user');
-    this.loggedUser = await fetch(`http://127.0.0.1:3000/api/v1/${this.user.role}s/updateMe`,{
-                    method: 'PATCH',
-                    headers: {
-                     "Content-Type": "application/json",
-                     "Authorization": `Bearer ${token}`,
-                    }});
+    console.log(token);
+    if (!token) return;
+    const res = await fetch(`http://127.0.0.1:3000/api/v1/users/me`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await res.json();
+    this.loggedUser = data.data.user;
+    this.isLoged = true;
   },
 };
 </script>
