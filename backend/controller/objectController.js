@@ -1,6 +1,5 @@
 const Object = require('../model/objectModel');
-const Location = require('../model/locationModel');
-const Vehicle = require('../model/vehicleModel');
+const User = require('../model/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const Initialize = require('../utils/initialize');
@@ -8,6 +7,7 @@ const Filter = require('../utils/filter');
 
 exports.getAllObjects = catchAsync(async (req, res, next) => {
   const objects = await Object.findAll();
+
   const newObjects = new Array();
 
   for(let obj of objects){ 
@@ -50,7 +50,8 @@ exports.findObject = catchAsync(async (req, res, next) => {
   const rating = req.query.rating;
 
   if(name) objects = Filter.filterByName(objects, name);
-  if(vehicleType) objects = Filter.filterByVehType(objects,vehicleType);
+  //DODATI
+  //if(vehicleType) objects = Filter.filterByVehType(objects,vehicleType);
   if(address) objects = Filter.filterByAddress(objects, address);
   if(rating) objects = Filter.filterByRating(objects, rating);
 
@@ -61,12 +62,41 @@ exports.findObject = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.createObject = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'Route not yet defined!',
+exports.createObject = catchAsync( async (req, res, next) => {
+  let manager = User.findById(req.body.managerId);
+
+  if(!manager || manager.storeId != '' || manager.role != 'manager')  return next(
+    new AppError(
+      'Manager does not exist or he is already a store owner',
+      404
+    )
+  );
+
+  const object = {
+    name: req.body.name,
+    workingHours: req.body.workingHours,
+    locationId: req.body.locationId,
+    logo: req.body.logo,
+    managerId: req.body.managerId,
+    vehiclesIds: [],
+    rating: 0,
+    open: false,
+  }
+
+  const newObject = await Object.create(object);
+  
+   manager = await User.findByIdAndUpdate(req.body.managerId, {
+    storeId: newObject.id
   });
-};
+
+  res.status(201).json({
+    status: 'success',
+    data: {
+      newObject
+    }
+  });
+});
+
 
 exports.updateObject = (req, res) => {
   res.status(500).json({

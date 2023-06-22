@@ -1,7 +1,5 @@
 const AppError = require('../utils/appError');
-const Customer = require('./../model/customerModel');
-const Admin = require('./../model/adminModel');
-const Manager = require('./../model/managerModel');
+const User = require('./../model/userModel');
 const catchAsync = require('./../utils/catchAsync');
 const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
@@ -49,8 +47,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     customerType: 3
   }
 
-  const newCustomer = await Customer.create(customer);
-
+  const newCustomer = await User.create(customer);
   createSendToken(newCustomer, 201, res);
 });
 
@@ -63,24 +60,11 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   //Provera da li su username i sifra validni
-  const customer = await Customer.checkValidity({username, password});
-  if(customer){
-    createSendToken(customer, 200, res);
-  }
-
-  const admin = await Admin.checkValidity({username, password});
-  if(admin){
-    createSendToken(admin, 200, res);
-  }
-
-  const manager = await Manager.checkValidity({username, password});
-  if(manager){
-    createSendToken(manager, 200, res);
-  }
-
-  if (!customer && !admin && !manager) {
+  const user = await User.checkValidity({username, password});
+  if(!user){
     return next(new AppError('Incorrect username or password', 401));
   }
+  createSendToken(user, 200, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -102,41 +86,20 @@ exports.protect = catchAsync(async (req, res, next) => {
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
   // Proveravamo da li korisnik i dalje postoji
-  const freshCustomer = await Customer.findById(decoded.id);
-  if(freshCustomer)
+  const user = await User.findById(decoded.id);
+  if(!user)
   {
-    //Dozvoljen pristup protected ruti
-    req.customer = freshCustomer;
-    next();
-  }
-
-  const freshAdmin = await Admin.findById(decoded.id);
-  if(freshAdmin)
-  {
-    //Dozvoljen pristup protected ruti
-    req.admin = freshAdmin;
-    next();
-  }
-
-  const freshManager = await Manager.findById(decoded.id);
-  if(freshManager)
-  {
-    //Dozvoljen pristup protected ruti
-    req.manager = freshManager;
-    next();
-  }
-
-  if (!freshCustomer && !freshAdmin && !freshManager) {
     return next(new AppError('The user does not no longer exist', 401));
   }
+  //Dozvoljen pristup protected ruti
+  req.user = user;
+  next();
 });
 
-//Kasnije ce biti potrebno, kako bi zastitili endpointe za administratora/menadzera/kupca
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
-    const loggedUser = req.customer || req.manager || req.admin;
-
-    if (!roles.includes(loggedUser.role)) {
+    console.log('EEEEE');
+    if (!roles.includes(req.user.role)) {
       return next(
         new AppError(
           'You do not have a permission to perform this action!',

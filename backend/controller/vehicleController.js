@@ -8,38 +8,69 @@ exports.getAllVehicles = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     results: vehicles.length,
-    data: { vehicles: vehicles },
+    data: { vehicles },
   });
 });
 
 exports.getVehicle = catchAsync(async (req, res, next) => {
   const id = req.params.id;
-  const vehicles = await Vehicle.findById(id);
+  const vehicle = await Vehicle.findById(id);
+
+  if(!vehicle) return next(new AppError('There is no vehicle with that id!', 404));
 
   res.status(200).json({
     status: 'success',
-    results: vehicles.length,
-    data: { vehicles: vehicles },
+    data: { vehicle },
   });
 });
 
-exports.createVehicle = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'Route not yet defined!',
-  });
-};
+exports.createVehicle = catchAsync(async (req, res, next) => {
+  const vehicle = {
+    brand: req.body.brand,
+    model: req.body.model,
+    price: req.body.price,
+    type: req.body.type,
+    rentCarObjectId: req.user.storeId,
+    transmission: req.body.transmission,
+    fuel_type: req.body.fuel_type,
+    consumption: req.body.consumption,
+    doors: req.body.doors,
+    capacity: req.body.capacity,
+    description: req.body.description,
+    image: req.body.image,
+    available: true,
+  };
 
-exports.updateVehicle = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'Route not yet defined!',
-  });
-};
+  const newVehicle = await Vehicle.create(vehicle);
 
-exports.deleteVehicle = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'Route not yet defined!',
+  res.status(201).json({
+    status: 'success',
+    data: {
+      newVehicle,
+    },
   });
-};
+});
+
+exports.updateVehicle = catchAsync(async (req, res, next) => {
+  const vehicleId = req.params.id;
+  const vehicle = { ...req.body };
+  const newVehicle = await Vehicle.findByIdAndUpdate(vehicleId, vehicle);
+
+  res.status(201).json({
+    status: 'success',
+    data: {
+      newVehicle,
+    },
+  });
+});
+
+exports.deleteVehicle = catchAsync(async (req, res, next) => {
+  const vehicle = await Vehicle.findById(req.params.id);
+  if (!vehicle) return next(new AppError('Vehicle does not exist!', 404));
+
+  await Vehicle.remove(req.params.id);
+
+  res.status(202).json({
+    status: 'success',
+  });
+});

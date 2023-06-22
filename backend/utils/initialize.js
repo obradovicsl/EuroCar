@@ -1,6 +1,5 @@
 const Vehicle = require('../model/vehicleModel');
 const Object = require('../model/objectModel');
-const Location = require('../model/locationModel');
 
 exports.initializeRentals = async function(rental) {
     const newRental = {...rental};
@@ -26,18 +25,16 @@ exports.initializeObject = async function(object) {
     try{
 
         const newObject = {...object};
+
+        const allVehicles = await Vehicle.findAll();
         
         const vehicles = new Array();
-        
-        const location = await Location.findById(newObject.locationId);
-        newObject.address = location?.address;
-        delete newObject.locationId;
-        for(const vehicleId of newObject.vehiclesIds)
+
+        for(const vehicle of allVehicles)
         {
-            const vehicle = await Vehicle.findById(vehicleId);
-            vehicle &&  vehicles.push(vehicle);
+            if(vehicle.rentCarObjectId == newObject.id)
+                vehicles.push(vehicle);
         }
-        delete newObject.vehiclesIds;
         newObject.vehicles = vehicles;
             
          return newObject;
