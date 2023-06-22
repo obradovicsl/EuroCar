@@ -52,7 +52,6 @@ export default {
     return {
       isLoged: false,
       loggedUser: {},
-      userRole: '',
     };
   },
 
@@ -63,8 +62,15 @@ export default {
       this.$router.push({ name: 'home' });
     },
   },
-  mounted() {
+  async mounted() {
     document.title = 'Rent A Car';
+    const token = localStorage.getItem('user');
+    this.loggedUser = await fetch(`http://127.0.0.1:3000/api/v1/${this.user.role}s/updateMe`,{
+                    method: 'PATCH',
+                    headers: {
+                     "Content-Type": "application/json",
+                     "Authorization": `Bearer ${token}`,
+                    }});
   },
 };
 </script>
