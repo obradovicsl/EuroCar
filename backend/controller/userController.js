@@ -1,14 +1,22 @@
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const User = require('../model/userModel');
+const Initialize = require('../utils/initialize');
 
 exports.getAllUsers = catchAsync(async (req, res, next) => {
   const users = await User.findAll();
 
+  const newUsers = new Array();
+
+  for(let user of users){ 
+    user = await Initialize.initializeUsers(user);
+    newUsers.push(user);
+  }
+
   res.status(200).json({
     status: 'success',
     results: users.length,
-    data: { users: users },
+    data: { users: newUsers },
   });
 });
 

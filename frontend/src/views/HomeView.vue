@@ -1,5 +1,5 @@
 <template>
-<div class="container">
+<div class="container p-4">
     <div class="row">
       <div class="col-sm-6 col-md-4 col-lg-3"  v-for="object in objects" :key="object.id">
            <RentCarCard :object="object"/>

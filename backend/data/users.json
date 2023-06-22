@@ -8,7 +8,6 @@
     "gender": "M",
     "birthDate": "10/05/1985",
     "role": "customer",
-    "rentalsIds": [],
     "basket": [],
     "points": 0,
     "customerType": 1
@@ -22,7 +21,6 @@
     "gender": "F",
     "birthDate": "15/09/1990",
     "role": "customer",
-    "rentalsIds": [],
     "basket": [],
     "points": 0,
     "customerType": 1
@@ -36,7 +34,6 @@
     "gender": "M",
     "birthDate": "05/07/1982",
     "role": "customer",
-    "rentalsIds": [],
     "basket": [],
     "points": 0,
     "customerType": 1
@@ -50,7 +47,6 @@
     "gender": "F",
     "birthDate": "20/12/1995",
     "role": "customer",
-    "rentalsIds": [],
     "basket": [],
     "points": 0,
     "customerType": 1
@@ -64,7 +60,6 @@
     "gender": "M",
     "birthDate": "2001-04-19",
     "role": "customer",
-    "rentalsIds": ["10212daf-bfc9-4b46-a977-5b29fd630111"],
     "basket": [],
     "points": 53.2,
     "customerType": 3
@@ -78,7 +73,6 @@
     "gender": "M",
     "birthDate": "2023-12-31",
     "role": "customer",
-    "rentalsIds": [],
     "basket": [],
     "points": 0,
     "customerType": 3
@@ -92,7 +86,6 @@
     "gender": "M",
     "birthDate": "2002-02-26",
     "role": "customer",
-    "rentalsIds": ["39312daf-b9c9-4a46-a977-5b29fd630111"],
     "basket": [],
     "points": 19.95,
     "customerType": 3

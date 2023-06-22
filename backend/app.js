@@ -1,9 +1,10 @@
 const express = require('express');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const vehicleRoutes = require('./routes/vehicleRoutes');
+const vehicleRouter = require('./routes/vehicleRoutes');
+const rentalRouter = require('./routes/rentalRoutes');
 const userRouter = require('./routes/userRoutes');
-const objectRoutes = require('./routes/objectRoutes');
+const objectRouter = require('./routes/objectRoutes');
 const globalErrorHandler = require('./controller/errorController');
 const AppError = require('./utils/appError');
 const cors = require('cors');
@@ -34,8 +35,9 @@ app.use(express.static(`${__dirname}/public`));
 
 // ROUTES
 app.use('/api/v1/users', userRouter);
-app.use('/api/v1/vehicles', vehicleRoutes);
-app.use('/api/v1/objects', objectRoutes);
+app.use('/api/v1/vehicles', vehicleRouter);
+app.use('/api/v1/rentals', rentalRouter);
+app.use('/api/v1/objects', objectRouter);
 
 //Ako dodjemo do ovog dela(linije) koda - to znaci da nismo 'upali' ni u jedan postojeci ruter, i da navedena ruta u req, ne postoji.   app.all - primenice se i na .get i na .post..... '*'-svaki URL
 app.all('*', (req, res, next)=> {
