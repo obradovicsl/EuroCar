@@ -128,7 +128,7 @@ export default {
         async register(){
             try{
                 let token = localStorage.getItem('user');
-                let response = await fetch('http://127.0.0.1:3000/api/v1/admins/createManager',{
+                let response = await fetch('http://127.0.0.1:3000/api/v1/users/createManager',{
                     method: 'POST',
                     headers: {
                      "Content-Type": "application/json",

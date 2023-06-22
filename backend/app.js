@@ -2,9 +2,7 @@ const express = require('express');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const vehicleRoutes = require('./routes/vehicleRoutes');
-const customerRoutes = require('./routes/customerRoutes');
-const adminRoutes = require('./routes/adminRoutes');
-const managerRoutes = require('./routes/managerRoutes');
+const userRouter = require('./routes/userRoutes');
 const objectRoutes = require('./routes/objectRoutes');
 const globalErrorHandler = require('./controller/errorController');
 const AppError = require('./utils/appError');
@@ -35,9 +33,7 @@ app.use(express.json({
 app.use(express.static(`${__dirname}/public`));
 
 // ROUTES
-app.use('/api/v1/customers', customerRoutes);
-app.use('/api/v1/admins', adminRoutes);
-app.use('/api/v1/managers', managerRoutes);
+app.use('/api/v1/users', userRouter);
 app.use('/api/v1/vehicles', vehicleRoutes);
 app.use('/api/v1/objects', objectRoutes);
 
