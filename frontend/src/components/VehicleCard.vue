@@ -10,6 +10,7 @@
         {{ this.vehicle.brand }} {{ this.vehicle.model }}
       </h5>
       <p class="card-text mb-4">
+        {{ this.vehicle.type }}
         {{ this.vehicle.transmission }}
         {{ this.vehicle.fuelType }}
       </p>

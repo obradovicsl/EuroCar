@@ -14,7 +14,7 @@ exports.filterByVehType = function(objects, vehicleType){
 
 exports.filterByAddress = function(objects, address){
     objects = objects.filter(obj => {
-      return obj.address.toLowerCase().includes(address.toLowerCase());
+      return obj.location.address.toLowerCase().includes(address.toLowerCase());
     });
    return objects;
   }

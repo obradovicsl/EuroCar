@@ -3,6 +3,8 @@ const objectController = require('../controller/objectController');
 const authController = require('./../controller/authController');
 const router = express.Router();
 
+router.route('/search').get(objectController.findObject);
+
 router
   .route('/')
   .get(objectController.getAllObjects)
@@ -12,13 +14,6 @@ router
     objectController.createObject
   );
 
-  router.route('/:id').get(objectController.getObject);
-
-router.use(authController.protect);
-router.use(authController.restrictTo('manager', 'admin'));
-
-router.route('/search').get(objectController.findObject);
-
-
+router.route('/:id').get(objectController.getObject);
 
 module.exports = router;

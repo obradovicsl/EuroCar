@@ -43,7 +43,7 @@
       Add New Vehicle
     </button>
 
-    <div class="row mb-4">
+    <div class="row mb-4" v-if="store.vehicles">
       <div
         class="col-sm-6 col-md-4 col-lg-3"
         v-for="vehicle in store.vehicles"
@@ -51,6 +51,10 @@
       >
         <VehicleCard :vehicle="vehicle" :isOwner="isOwner" />
       </div>
+    </div>
+
+    <div class="row mb-4" v-if="!vehicles.length">
+      <p>No vehicles</p>
     </div>
 
     <h1 class="comment_header">Reviews</h1>
@@ -79,6 +83,7 @@ export default {
       zoom: 13,
       store: {},
       isOwner: false,
+      vehicles: [],
     };
   },
   components: {
@@ -100,6 +105,7 @@ export default {
     this.markerLatLng = new Array();
     this.markerLatLng.push(this.latitude);
     this.markerLatLng.push(this.longitude);
+    this.vehicles = this.store.vehicles;
     if (this.map) {
       this.doSomethingOnReady();
     }

@@ -36,6 +36,7 @@ exports.getObject = catchAsync(async (req, res, next) => {
 });
 
 exports.findObject = catchAsync(async (req, res, next) => {
+
   const o = await Object.findAll();
   let objects = new Array();
 
@@ -49,11 +50,13 @@ exports.findObject = catchAsync(async (req, res, next) => {
   const address = req.query.address;
   const rating = req.query.rating;
 
-  if(name) objects = Filter.filterByName(objects, name);
-  //DODATI
-  //if(vehicleType) objects = Filter.filterByVehType(objects,vehicleType);
-  if(address) objects = Filter.filterByAddress(objects, address);
-  if(rating) objects = Filter.filterByRating(objects, rating);
+
+  if(name != '') objects = Filter.filterByName(objects, name);
+  if(vehicleType != '') objects = Filter.filterByVehType(objects,vehicleType);
+  if(address != '') objects = Filter.filterByAddress(objects, address);
+  if(rating > 0) objects = Filter.filterByRating(objects, rating);
+
+
 
   res.status(200).json({
     status: 'success',
