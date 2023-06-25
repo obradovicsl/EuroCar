@@ -32,7 +32,7 @@ exports.createVehicle = catchAsync(async (req, res, next) => {
     type: req.body.type,
     rentCarObjectId: req.user.storeId,
     transmission: req.body.transmission,
-    fuel_type: req.body.fuel_type,
+    fuelType: req.body.fuelType,
     consumption: req.body.consumption,
     doors: req.body.doors,
     capacity: req.body.capacity,

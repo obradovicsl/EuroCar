@@ -7,7 +7,7 @@
     <p>Birth date: {{ user.birthDate }}</p>
     <p v-if="user.role == 'customer'">Points: {{ user.points }}</p>
     <p v-if="user.role == 'customer'">Customer type: {{ user.customerType }}</p>
-    <button @click="updateProfile">Update Profile</button>
+    <button class="btn btn-primary" @click="updateProfile">Update Profile</button>
 
     <div v-if="user.role == 'customer'">
       <h2>Previous rentals:</h2>

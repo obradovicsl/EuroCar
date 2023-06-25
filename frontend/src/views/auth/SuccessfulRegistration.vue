@@ -1,6 +1,6 @@
 <template>
 <div>
-  <h1>You successfuly registrated!</h1>
+  <h1>Successful!</h1>
   <router-link :to="{name: 'home'}">Home Page</router-link>
 </div>
 </template>

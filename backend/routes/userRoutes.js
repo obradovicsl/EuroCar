@@ -9,6 +9,9 @@ router.post('/login', authController.login);
 // Protect all routes after this middleware
 router.use(authController.protect);
 
+router.post('/basket',authController.restrictTo('customer'), userController.createBasket);
+router.get('/basket', authController.restrictTo('customer'), userController.getBasket);
+
 router.patch('/updateMe', userController.updateMe);
 router.delete('/deleteMe', userController.deleteMe);
 router.get('/me', userController.getMe, userController.getUser);

@@ -29,6 +29,17 @@
               </router-link>
             </li>
 
+            <li class="nav-item">
+              <router-link
+                class="nav-link"
+                :to="{ name: 'viewStore', params: { id: loggedUser.storeId } }"
+                v-if="loggedUser.role == 'manager' && isLoged"
+              >
+                My store
+              </router-link>
+            </li>
+            
+
             <li
               class="nav-item dropdown"
               v-if="loggedUser.role == 'admin' && isLoged"
@@ -62,6 +73,8 @@
                 </li>
               </ul>
             </li>
+
+            
 
             <li class="nav-item">
               <router-link

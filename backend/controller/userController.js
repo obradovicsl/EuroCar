@@ -1,6 +1,7 @@
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const User = require('../model/userModel');
+const Vehicle = require('../model/vehicleModel');
 const Initialize = require('../utils/initialize');
 
 exports.getAllUsers = catchAsync(async (req, res, next) => {
@@ -118,3 +119,37 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
     user: null,
   });
 });
+
+exports.createBasket = catchAsync(async (req, res, next) => {
+  const basket = req.body;
+  const vehicle = await Vehicle.findById(basket.vehicleId);
+  if(!vehicle) return next(new AppError('Vehicle does not exist', 404));
+  basket.objectId = vehicle.rentCarObjectId;
+  basket.price = vehicle.price;
+  const user = await User.findByIdAndUpdate(req.user.id, { basket });
+
+  if (!user) next(new AppError('No user found!', 404));
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      basket
+    }
+  });
+});
+
+exports.getBasket = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+  const basket = user.basket;
+
+  if (!user) next(new AppError('No user found!', 404));
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      basket
+    }
+  });
+});
+
+

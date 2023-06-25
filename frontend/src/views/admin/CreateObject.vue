@@ -77,8 +77,8 @@
           </option>
         </select>
         <div v-if="availableManagers.length == 0">
-          <p>THERE IS NO AWAILABLE MANAGERS!</p>
-          <button @click="createManagerHandle">CREATE ONE</button>
+          <p>THERE IS NO AVAILABLE MANAGERS!</p>
+          <button class="btn btn-primary" @click="createManagerHandle">CREATE ONE</button>
         </div>
       </div>
 
@@ -99,8 +99,8 @@ export default {
   data() {
     return {
       zoom: 13,
-      latitude: null,
-      longitude: null,
+      latitude: 0,
+      longitude: 0,
       location: {},
       address: '',
       markerLatLng: [12, 13],
@@ -208,6 +208,10 @@ export default {
     const data = await response.json();
     console.log(data.data.availableManagers);
     this.availableManagers = data.data.availableManagers;
+
+    if(this.map){
+      this.doSomethingOnReady();
+    }
   },
 };
 </script>

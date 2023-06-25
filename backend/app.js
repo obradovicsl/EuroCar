@@ -18,7 +18,7 @@ app.use(helmet());
 
 // Limit requests from same API
 const limiter = rateLimit({
-    max: 100,  // 100 requestova
+    max: 1000,  // 100 requestova
     windowMs: 60 * 60 * 1000,  // u prozoru od 1h
     message: 'Too many requests from this IP, try again in an hour!',
 });
