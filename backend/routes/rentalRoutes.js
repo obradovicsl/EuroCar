@@ -4,14 +4,27 @@ const authController = require('./../controller/authController');
 const router = express.Router();
 
 
+router.use(authController.protect);
+
 router
   .route('/')
   .get(rentalController.getAllRentals)
-  .post(authController.protect, authController.restrictTo('customer'), rentalController.createRental);
+  .post(authController.restrictTo('customer'), rentalController.createRental);
   
 router
+  .route('/cancel/:id')
+  .patch(authController.restrictTo('customer'), rentalController.cancelRental);
+
+router
   .route('/:id')
-  .get(rentalController.getRental)
-  .patch(rentalController.updateRental);
+  .patch(authController.restrictTo('manager'), rentalController.updateRentalStatus);
+
+router
+  .route('/customers')
+  .get(authController.restrictTo('customer'), rentalController.getCustomersRentals);
+
+router
+  .route('/managers')
+  .get(authController.restrictTo('manager'), rentalController.getManagersRentals);
   
 module.exports = router;

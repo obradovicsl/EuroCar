@@ -2,7 +2,7 @@
   {
     "id": "573e2dcc-b9c9-4a46-a977-5b29fd630111",
     "name": "RenCar2Go",
-    "workingHours": { "from": 8, "to": 20 },
+    "workingHours": { "from": "08:00", "to": "20:00" },
     "open": true,
     "location": {
       "lat": 40.7128,
@@ -16,7 +16,7 @@
   {
     "id": "573e2dcc-b9c9-4a46-a977-5b29fd630221",
     "name": "Ren Auto Rentals",
-    "workingHours": { "from": 8, "to": 19 },
+    "workingHours": { "from": "09:00", "to": "17:00" },
     "open": false,
     "location": {
       "lat": 51.5074,
@@ -29,7 +29,7 @@
   {
     "id": "573e2dcc-b9c9-4a46-a977-5b29fd6309af",
     "name": "Ren Wheels",
-    "workingHours": { "from": 10, "to": 17 },
+    "workingHours": { "from": "10:00", "to": "12:00" },
     "open": true,
     "location": {
       "lat": 35.6895,
@@ -42,7 +42,7 @@
   {
     "id": "573e2daa-b9c9-4a46-a917-5b29fd630370",
     "name": "Ren Car Rentals",
-    "workingHours": { "from": 9, "to": 20 },
+    "workingHours": { "from": "09:00", "to": "16:14" },
     "open": false,
     "location": {
       "lat": 44.8167,
@@ -56,7 +56,7 @@
   {
     "id": "13cfefb3-8b80-4965-8d86-6bca48c70b1e",
     "name": "Test",
-    "workingHours": { "from": "8", "to": "22" },
+    "workingHours": { "from": "08:00", "to": "22:00" },
     "location": {
       "lat": "45.2440337",
       "lon": "19.7943494",

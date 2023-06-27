@@ -10,7 +10,7 @@ exports.getAllObjects = catchAsync(async (req, res, next) => {
 
   const newObjects = new Array();
 
-  for(let obj of objects){ 
+  for (let obj of objects) {
     obj = await Initialize.initializeObject(obj);
     newObjects.push(obj);
   }
@@ -36,11 +36,10 @@ exports.getObject = catchAsync(async (req, res, next) => {
 });
 
 exports.findObject = catchAsync(async (req, res, next) => {
-
   const o = await Object.findAll();
   let objects = new Array();
 
-  for(let obj of o){ 
+  for (let obj of o) {
     obj = await Initialize.initializeObject(obj);
     objects.push(obj);
   }
@@ -50,13 +49,10 @@ exports.findObject = catchAsync(async (req, res, next) => {
   const address = req.query.address;
   const rating = req.query.rating;
 
-
-  if(name != '') objects = Filter.filterByName(objects, name);
-  if(vehicleType != '') objects = Filter.filterByVehType(objects,vehicleType);
-  if(address != '') objects = Filter.filterByAddress(objects, address);
-  if(rating > 0) objects = Filter.filterByRating(objects, rating);
-
-
+  if (name != '') objects = Filter.filterByName(objects, name);
+  if (vehicleType != '') objects = Filter.filterByVehType(objects, vehicleType);
+  if (address != '') objects = Filter.filterByAddress(objects, address);
+  if (rating > 0) objects = Filter.filterByRating(objects, rating);
 
   res.status(200).json({
     status: 'success',
@@ -65,16 +61,40 @@ exports.findObject = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.createObject = catchAsync( async (req, res, next) => {
+exports.filterObjects = catchAsync(async (req, res, next) => {
+  const o = await Object.findAll();
+  let objects = new Array();
+
+  for (let obj of o) {
+    obj = await Initialize.initializeObject(obj);
+    objects.push(obj);
+  }
+
+  const fuelType = req.query.fuelType;
+  const type = req.query.type;
+  const isOpen = req.query.open;
+
+  console.log(fuelType, type, isOpen);
+
+  if (fuelType && fuelType != 'None') objects = Filter.filterByFuelType(objects, fuelType);
+  if (type && type != 'None') objects = Filter.filterByVehType(objects, type);
+  if (isOpen && isOpen != 'False') objects = Filter.filterByOpenState(objects);
+
+  res.status(200).json({
+    status: 'success',
+    results: objects.length,
+    data: { objects: objects },
+  });
+});
+
+exports.createObject = catchAsync(async (req, res, next) => {
   console.log(req.body);
   let manager = await User.findById(req.body.managerId);
   console.log(manager);
-  if(!manager || manager.storeId != '' || manager.role != 'manager')  return next(
-    new AppError(
-      'Manager does not exist or he is already a store owner',
-      404
-    )
-  );
+  if (!manager || manager.storeId != '' || manager.role != 'manager')
+    return next(
+      new AppError('Manager does not exist or he is already a store owner', 404)
+    );
 
   const object = {
     name: req.body.name,
@@ -85,22 +105,21 @@ exports.createObject = catchAsync( async (req, res, next) => {
     vehiclesIds: [],
     rating: 0,
     open: false,
-  }
+  };
 
   const newObject = await Object.create(object);
-  
-   manager = await User.findByIdAndUpdate(req.body.managerId, {
-    storeId: newObject.id
+
+  manager = await User.findByIdAndUpdate(req.body.managerId, {
+    storeId: newObject.id,
   });
 
   res.status(201).json({
     status: 'success',
     data: {
-      newObject
-    }
+      newObject,
+    },
   });
 });
-
 
 exports.updateObject = (req, res) => {
   res.status(500).json({

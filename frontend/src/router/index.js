@@ -11,6 +11,8 @@ import CreateObject from '../views/admin/CreateObject.vue'
 import CreateVehicle from '../views/manager/CreateVehicle.vue'
 import UpdateVehicle from '../views/manager/UpdateVehicle.vue'
 import SuccessfulRegistration from '../views/auth/SuccessfulRegistration.vue'
+import CartView from '../views/CartView.vue'
+import RentVehicleView from '../views/RentVehicleView.vue'
 
 const routes = [
   {
@@ -67,6 +69,16 @@ const routes = [
     path: '/store/:id',
     name: 'viewStore',
     component: StoreView
+  },
+  {
+    path: '/cart',
+    name: 'cart',
+    component: CartView
+  },
+  {
+    path: '/rent',
+    name: 'rent',
+    component: RentVehicleView
   },
   {
     path: '/:catchAll(.*)',

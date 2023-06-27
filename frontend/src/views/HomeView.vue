@@ -1,7 +1,6 @@
 <template>
   <div class="container p-4">
     <h1>Rent'a Car Objects</h1>
-
     <div class="search__section">
       <div class="row mb-4">
         <div class="col">
@@ -39,7 +38,7 @@
             class="form-select"
             id="fuelType"
             v-model="fuelFilter"
-            @change="filterFuel"
+            @change="filter"
           >
             <option value="None">None</option>
             <option value="Petrol">Petrol</option>
@@ -48,7 +47,12 @@
         </div>
         <div class="col">
           <label for="vehType" class="form-label">Vehicle Type</label>
-          <select class="form-select" id="type" v-model="typeFilter" @change="filterType">
+          <select
+            class="form-select"
+            id="type"
+            v-model="typeFilter"
+            @change="filter"
+          >
             <option value="None">None</option>
             <option value="Van">Van</option>
             <option value="Sedan">Sedan</option>
@@ -58,7 +62,12 @@
         </div>
         <div class="col">
           <label for="vehType" class="form-label">Only open objects</label>
-          <select class="form-select" id="type" v-model="openFilter" @change="filterOpen">
+          <select
+            class="form-select"
+            id="type"
+            v-model="openFilter"
+            @change="filter"
+          >
             <option value="True">True</option>
             <option value="False">False</option>
           </select>
@@ -66,7 +75,12 @@
 
         <div class="col">
           <label for="vehType" class="form-label">Sort</label>
-          <select class="form-select" id="type" v-model="type">
+          <select
+            class="form-select"
+            id="type"
+            v-model="sortValue"
+            @change="sort"
+          >
             <option value="Name">Name</option>
             <option value="Address">Address</option>
             <option value="Rating">Rating</option>
@@ -77,11 +91,13 @@
 
     <div class="row">
       <div
-        class="col-sm-6 col-md-4 col-lg-3"
-        v-for="object in filteredObjects"
+        class="col-md-3 col-sm-6"
+        v-for="object in objects"
         :key="object.id"
       >
+      <div class="card">
         <RentCarCard :object="object" />
+      </div>
       </div>
     </div>
   </div>
@@ -94,7 +110,6 @@ export default {
   data() {
     return {
       objects: [],
-      filteredObjects: [],
       name: '',
       type: '',
       location: '',
@@ -102,6 +117,7 @@ export default {
       fuelFilter: '',
       typeFilter: '',
       openFilter: '',
+      sortValue: '',
     };
   },
   name: 'HomeView',
@@ -112,7 +128,6 @@ export default {
     let response = await fetch('http://127.0.0.1:3000/api/v1/objects/');
     let data = await response.json();
     this.objects = data.data.objects;
-    this.filteredObjects = this.objects;
     this.objects.sort((a, b) => {
       if (a.open && !b.open) {
         return -1; // a ide prije b
@@ -130,48 +145,58 @@ export default {
       );
       let data = await response.json();
       this.objects = data.data.objects;
-      this.filteredObjects = this.objects;
     },
-    async filterFuel() {
-      if (this.fuelFilter == 'None') {
-        this.filteredObjects = this.objects;
-        return;
-      }
-      this.filteredObjects = this.objects.filter(
-        function (obj) {
-          return obj.vehicles.find(
-            function (veh) {
-              return veh.fuelType == this.fuelFilter;
-            }.bind(this)
-          );
-        }.bind(this)
+    async filter() {
+      let response = await fetch(
+        `http://127.0.0.1:3000/api/v1/objects/filter?fuelType=${this.fuelFilter}&type=${this.typeFilter}&open=${this.openFilter}`
       );
+      let data = await response.json();
+    //   this. = this.objects.forEach((obj) =>
+    //     data.data.objects.filter((o) => {
+    //     console.log(o.id, obj.id);
+    //     return o.id == obj.id
+    // })
+    //   );
+    //   console.log(this.);
+    //   console.log(this.objects);
+      this.objects = data.data.objects;
     },
-    filterType() {
-        if (this.typeFilter == 'None') {
-        this.filteredObjects = this.objects;
-        return;
+    async sort() {
+      switch (this.sortValue) {
+        case 'Name':
+          this.objects.sort((a, b) => {
+            if (a.name > b.name) {
+              return -1; // a ide prije b
+            } else if (a.name < b.name) {
+              return 1; // b ide prije a
+            } else {
+              return 0; // nema promjene u redoslijedu
+            }
+          });
+          break;
+        case 'Address':
+          this.objects.sort((a, b) => {
+            if (a.location.address > b.location.address) {
+              return -1; // a ide prije b
+            } else if (a.location.address < b.location.address) {
+              return 1; // b ide prije a
+            } else {
+              return 0; // nema promjene u redoslijedu
+            }
+          });
+          break;
+        case 'Rating':
+          this.objects.sort((a, b) => {
+            if (a.rating > b.rating) {
+              return -1; // a ide prije b
+            } else if (a.rating < b.rating) {
+              return 1; // b ide prije a
+            } else {
+              return 0; // nema promjene u redoslijedu
+            }
+          });
+          break;
       }
-      this.filteredObjects = this.objects.filter(
-        function (obj) {
-          return obj.vehicles.find(
-            function (veh) {
-              return veh.type == this.typeFilter;
-            }.bind(this)
-          );
-        }.bind(this)
-      );
-    },
-    filterOpen() {
-       if (this.openFilter == 'False') {
-        this.filteredObjects = this.objects;
-        return;
-      }
-      this.filteredObjects = this.objects.filter(
-        function (obj) {
-          return obj.open;
-        }.bind(this)
-      );
     },
   },
 };

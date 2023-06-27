@@ -4,12 +4,13 @@ const authController = require('./../controller/authController');
 const router = express.Router();
 
 router.use(authController.protect);
-router.use(authController.restrictTo('manager'));
+
+router.route('/available').get(vehicleController.getAvailableVehicles);
 
 router
   .route('/')
   .get(vehicleController.getAllVehicles)
-  .post(vehicleController.createVehicle);
+  .post(authController.restrictTo('manager'), vehicleController.createVehicle);
   
 router
   .route('/:id')

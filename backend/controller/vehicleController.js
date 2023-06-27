@@ -1,4 +1,5 @@
 const Vehicle = require('../model/vehicleModel');
+const Rental = require('../model/rentalModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
@@ -16,7 +17,8 @@ exports.getVehicle = catchAsync(async (req, res, next) => {
   const id = req.params.id;
   const vehicle = await Vehicle.findById(id);
 
-  if(!vehicle) return next(new AppError('There is no vehicle with that id!', 404));
+  if (!vehicle)
+    return next(new AppError('There is no vehicle with that id!', 404));
 
   res.status(200).json({
     status: 'success',
@@ -72,5 +74,46 @@ exports.deleteVehicle = catchAsync(async (req, res, next) => {
 
   res.status(202).json({
     status: 'success',
+  });
+});
+
+exports.getAvailableVehicles = catchAsync(async (req, res, next) => {
+  const startDate = new Date(req.query.start);
+  const endDate = new Date(req.query.end);
+
+  let rentals = await Rental.findAll();
+  let allVehicles = await Vehicle.findAll();
+
+  let unavailableVehicles = new Set();
+  rentals = rentals.filter(rental => (rental.status !='RETURNED' && rental.status != 'REJECTED' && rental.status != 'CANCELED'))
+
+  
+  for (ren of rentals) {
+    let renStartDate = new Date(ren.startDate);
+    let renEndDate = new Date(ren.endDate);
+    
+    console.log(renStartDate, renEndDate);
+    if (
+      (renStartDate >= startDate && renStartDate <= endDate) ||
+      (renEndDate >= startDate && renEndDate <= endDate)
+    ) {
+      for (veh of ren.rentedVehiclesIds) {
+        unavailableVehicles.add(veh);
+      }
+    }
+  }
+
+  unavailableVehicles = [...unavailableVehicles];
+  console.log(unavailableVehicles);
+
+  const availableVehicles = allVehicles.filter(
+    (veh) =>
+      !unavailableVehicles.some((unavailableVeh) => unavailableVeh == veh.id)
+  );
+
+  res.status(200).json({
+    status: 'success',
+    results: availableVehicles.length,
+    data: { availableVehicles },
   });
 });

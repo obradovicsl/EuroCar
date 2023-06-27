@@ -4,6 +4,7 @@ const authController = require('./../controller/authController');
 const router = express.Router();
 
 router.route('/search').get(objectController.findObject);
+router.route('/filter').get(objectController.filterObjects);
 
 router
   .route('/')

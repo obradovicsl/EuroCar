@@ -15,7 +15,7 @@
             <input
               type="text"
               class="form-control"
-              placeholder="Open at"
+              placeholder="Open at (00:00)"
               v-model="openAt"
             />
           </div>
@@ -23,7 +23,7 @@
             <input
               type="text"
               class="form-control"
-              placeholder="Closed at"
+              placeholder="Closed at (00:00)"
               v-model="closedAt"
             />
           </div>
@@ -167,6 +167,14 @@ export default {
     },
     async registerObject(e) {
       e.preventDefault();
+      if(!this.openAt.includes(':') || this.openAt.length != 5) {
+        alert('Open at is not in good format!');
+        return;
+      } 
+      if(!this.closedAt.includes(':') || this.closedAt.length != 5) {
+        alert('Closed at is not in good format!');
+        return;
+      } 
       let token = localStorage.getItem('user');
       let response = await fetch('http://127.0.0.1:3000/api/v1/objects/', {
         method: 'POST',

@@ -38,8 +38,6 @@
                 My store
               </router-link>
             </li>
-            
-
             <li
               class="nav-item dropdown"
               v-if="loggedUser.role == 'admin' && isLoged"
@@ -74,8 +72,6 @@
               </ul>
             </li>
 
-            
-
             <li class="nav-item">
               <router-link
                 class="nav-link"
@@ -85,9 +81,27 @@
               >
             </li>
 
-            <button v-if="isLoged" class="btn btn-primary" @click="logout">
-              Logout
-            </button>
+            <li class="nav-item">
+              <router-link
+                :to="{ name: 'cart' }"
+                class="nav-link"
+                v-if="loggedUser.role == 'customer' && isLoged"
+              >
+                Cart Items: {{loggedUser.basket.totalQuantity}}
+              </router-link>
+            </li>
+
+            <li class="nav-item">
+              <router-link
+                class="btn btn-primary"
+                :to="{ name: 'rent' }"
+                v-if="loggedUser.role == 'customer' && isLoged"
+              >
+                Rent a Vehicle
+              </router-link>
+            </li>
+
+            <button v-if="isLoged" class="btn" @click="logout">Logout</button>
           </ul>
         </div>
       </div>
@@ -102,6 +116,8 @@ export default {
     return {
       isLoged: false,
       loggedUser: {},
+      daysNum: 0,
+      startDate: '',
     };
   },
 

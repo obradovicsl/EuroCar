@@ -9,7 +9,7 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
 
   const newUsers = new Array();
 
-  for(let user of users){ 
+  for (let user of users) {
     user = await Initialize.initializeUsers(user);
     newUsers.push(user);
   }
@@ -120,23 +120,77 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.createBasket = catchAsync(async (req, res, next) => {
-  const basket = req.body;
-  const vehicle = await Vehicle.findById(basket.vehicleId);
-  if(!vehicle) return next(new AppError('Vehicle does not exist', 404));
-  basket.objectId = vehicle.rentCarObjectId;
-  basket.price = vehicle.price;
-  const user = await User.findByIdAndUpdate(req.user.id, { basket });
+exports.addToBasket = catchAsync(async (req, res, next) => {
+  let user = await User.findById(req.user.id);
+  let basket = { vehicles: [], totalQuantity: 0, totalPrice: 0 };
+  if (user.basket.totalQuantity == 0) {
+    const vehicle = await Vehicle.findById(req.body.vehicleId);
+    basket = initializeBasket(
+      basket,
+      vehicle,
+      req.body.daysNum,
+      user.customerType
+    );
+  } else {
+    const vehicle = await Vehicle.findById(req.body.vehicleId);
+    basket = addItemToBasket(
+      user.basket,
+      vehicle,
+      user.customerType
+    );
+  }
 
-  if (!user) next(new AppError('No user found!', 404));
+  user = await User.findByIdAndUpdate(req.user.id, { basket: basket });
 
   res.status(200).json({
     status: 'success',
     data: {
-      basket
-    }
+      user,
+    },
   });
 });
+
+const initializeBasket = function (basket, vehicle, daysNum, customerType) {
+  basket.vehicles.push({
+    vehicle: vehicle,
+    quantity: 1,
+    price: vehicle.price * daysNum,
+  });
+  basket.totalQuantity++;
+  basket.totalPrice = vehicle.price * daysNum;
+  basket.daysNum = daysNum;
+  if (customerType == 2)
+    basket.discountedPrice = basket.totalPrice - basket.totalPrice * 0.05;
+  if (customerType == 1)
+    basket.discountedPrice = basket.totalPrice - basket.totalPrice * 0.1;
+  return basket;
+};
+
+const addItemToBasket = function (basket, vehicle, customerType) {
+  for (veh of basket.vehicles) {
+    if (veh.vehicle.id == vehicle.id) {
+      veh.quantity++;
+      veh.price += veh.vehicle.price * basket.daysNum;
+      basket.totalQuantity++;
+      basket.totalPrice += veh.vehicle.price * basket.daysNum;
+      console.log(basket.daysNum);
+      if (customerType == 2)
+        basket.discountedPrice = basket.totalPrice - basket.totalPrice * 0.05;
+      if (customerType == 1)
+        basket.discountedPrice = basket.totalPrice - basket.totalPrice * 0.1;
+      return basket;
+    }
+  }
+
+  basket.vehicles.push({
+    vehicle: vehicle,
+    quantity: 1,
+    price: vehicle.price * basket.daysNum,
+  });
+  basket.totalQuantity++;
+  basket.totalPrice += vehicle.price * basket.daysNum;
+  return basket;
+};
 
 exports.getBasket = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.user.id);
@@ -147,9 +201,7 @@ exports.getBasket = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     data: {
-      basket
-    }
+      basket,
+    },
   });
 });
-
-

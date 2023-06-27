@@ -6,6 +6,8 @@
       <p>{{ this.object.location.address }}</p>
       <p>{{ this.object.rating }}</p>
       <button class="btn" @click="viewStore">View Store</button>
+      <p class="open__badge" v-if="object.open">OPEN</p>
+      <p class="closed__badge" v-if="!object.open">CLOSED</p>
     </div>
   </div>
 </template>
@@ -46,10 +48,27 @@ export default {
   border-radius: 11px;
   overflow: hidden;
   transition: all 0.4s;
+  position: relative;
 }
+
+.open__badge,
+.closed__badge{
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  padding: 4px;
+  background: green;
+  color: white;
+} 
+
+.closed__badge{
+  background: red;
+} 
 
 .card img {
   width: 100%;
+  height: 15vw;
+  object-fit: cover;
 }
 
 .card-content {

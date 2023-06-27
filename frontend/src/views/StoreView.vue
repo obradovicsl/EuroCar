@@ -10,12 +10,13 @@
 
     <div class="second">
       <p>
-        Radno vreme:
-        <span>{{ store.workingHours }} - {{ store.workingHours }}</span>
+        Working time:
+        {{ store.workingHours.from }}
+        - {{ store.workingHours.to }}
       </p>
-      <p v-if="store.open">OTVORENO</p>
-      <p v-if="!store.open">ZATVORENO</p>
-      <!-- <p>Adresa: {{store.location.address}}</p> -->
+      <p v-if="store.open">Currently OPEN</p>
+      <p v-if="!store.open">Currently CLOSED</p>
+      <p>Address: {{ store.location.address }}</p>
     </div>
 
     <div style="height: 400px; width: 1200px container" class="map__container">
@@ -38,6 +39,8 @@
       </l-map>
     </div>
 
+    <h1 class="mb-4">Rent a vehicle</h1>
+
     <h1 class="veh_header">Vehicles</h1>
     <button class="btn btn-primary mb-4" v-if="isOwner" @click="addNewVehicle">
       Add New Vehicle
@@ -49,13 +52,15 @@
         v-for="vehicle in store.vehicles"
         :key="vehicle.id"
       >
-        <VehicleCard :vehicle="vehicle" :isOwner="isOwner" />
+        <VehicleCard :vehicle="vehicle" :isOwner="isOwner" :canRent="false" />
       </div>
     </div>
 
     <div class="row mb-4" v-if="!vehicles.length">
       <p>No vehicles</p>
     </div>
+
+   
 
     <h1 class="comment_header">Reviews</h1>
     <!-- <div class="row mb-4">
@@ -81,9 +86,10 @@ export default {
       longitude: 0,
       markerLatLng: [0, 0],
       zoom: 13,
-      store: {},
+      store: { workingHours: '', location: '' },
       isOwner: false,
       vehicles: [],
+
     };
   },
   components: {
@@ -120,14 +126,22 @@ export default {
       this.map = this.$refs.map.leafletObject;
       this.map.panTo([this.latitude, this.longitude]);
     },
-    addNewVehicle(){
-        this.$router.push({ name: 'createVehicle' });
-    }
+    addNewVehicle() {
+      this.$router.push({ name: 'createVehicle' });
+    },
   },
 };
 </script>
 
 <style>
+.date {
+  display: inline;
+  width: 20%;
+  font-size: 12px;
+}
+.form {
+  margin-bottom: 100px;
+}
 .main {
   display: flex;
   margin-bottom: 50px;
