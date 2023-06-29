@@ -5,7 +5,7 @@
       <h2>{{ this.object.name }}</h2>
       <p>{{ this.object.location.address }}</p>
       <p>{{ this.object.rating }}</p>
-      <button class="btn" @click="viewStore">View Store</button>
+      <button class="btn" @click="viewStore" v-if="$root.isLoged == true">View Store</button>
       <p class="open__badge" v-if="object.open">OPEN</p>
       <p class="closed__badge" v-if="!object.open">CLOSED</p>
     </div>

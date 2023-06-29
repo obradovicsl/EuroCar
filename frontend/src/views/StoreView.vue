@@ -162,6 +162,7 @@ export default {
         }
       );
       const data = await res.json();
+      console.log(data);
       this.reviews = data.data.reviews;
     },
     doSomethingOnReady() {

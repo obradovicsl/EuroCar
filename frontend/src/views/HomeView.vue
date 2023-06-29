@@ -1,6 +1,6 @@
 <template>
   <div class="container p-4">
-    <h1>Rent'a Car Objects</h1>
+    <h1>Renta Car Objects</h1>
     <div class="search__section">
       <div class="row mb-4">
         <div class="col">

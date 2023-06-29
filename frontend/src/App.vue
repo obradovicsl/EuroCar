@@ -2,7 +2,7 @@
   <div>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <div class="container-fluid">
-        <a class="navbar-brand" href="#">Navbar</a>
+        <a class="navbar-brand" href="#">Renta Car</a>
         <button
           class="navbar-toggler"
           type="button"
@@ -137,7 +137,7 @@ export default {
     },
   },
   async mounted() {
-    document.title = 'Rent A Car';
+    document.title = 'Renta Car';
     const token = localStorage.getItem('user');
     if (!token) return;
     const res = await fetch(`http://127.0.0.1:3000/api/v1/users/me`, {
