@@ -1,6 +1,7 @@
 <template>
-  <div class="container p-4">
-    <form @submit="registerVehicle">
+  <div class="container">
+    <form class="form" @submit="registerVehicle">
+      <h2>Create New Vehicle</h2>
       <div class="mb-3">
         <div class="row">
           <div class="col">
@@ -188,7 +189,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .error {
   color: red;
 }
@@ -198,5 +199,14 @@ export default {
   text-transform: uppercase;
   cursor: pointer;
   color: #0b7285;
+}
+
+.form{
+  background-color: #ddd;
+  border-radius: 20px;
+  padding: 20px;
+}
+.container{
+    padding: 50px 250px 20px 250px;
 }
 </style>

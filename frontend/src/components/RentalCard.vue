@@ -6,19 +6,21 @@
       @reject="rejectReason"
       @close="hideRejectModal"
     />
+    <RateModal v-if="isVisibleRate" @rate="rateStore" @close="hideRateModal" />
 
-    <img
-      :src="rent.object.logo"
-      class="card-img-top"
-      alt=""
-    />
+    <img :src="rent.object.logo" class="card-img-top" alt="" />
     <div class="card-body">
       <h5 class="card-title">{{ rent.object.name }}</h5>
       <p class="card-text">
         From: {{ startDate }} | Duration: {{ rent.rentalDuration }} day
       </p>
       <p class="card-text">Price: ${{ rent.price }}</p>
-      <p class="card-text">Status: {{ rent.status }} <span v-if="rent.status == 'REJECTED'">| Reason: {{rent.reason}}</span></p>
+      <p class="card-text">
+        Status: {{ rent.status }}
+        <span v-if="rent.status == 'REJECTED'"
+          >| Reason: {{ rent.reason }}</span
+        >
+      </p>
       <div class="vehicles">
         <h5>Rented vehicles:</h5>
         <button
@@ -43,7 +45,9 @@
         class="mt-4 action"
         v-if="user.role == 'manager' && rent.status == 'PROCESSING'"
       >
-        <button class="btn btn-success" @click="updateRental('APPROVED')">Approve</button>
+        <button class="btn btn-success" @click="updateRental('APPROVED')">
+          Approve
+        </button>
         <button class="btn btn-danger" @click="showRejectModal">Reject</button>
       </div>
       <button
@@ -60,6 +64,17 @@
       >
         Return
       </button>
+      <button
+        v-if="
+          user.role == 'customer' &&
+          rent.status == 'RETURNED' &&
+          canRate == true
+        "
+        class="btn btn-primary action"
+        @click="showRateModal()"
+      >
+        Rate Store
+      </button>
     </div>
   </div>
 </template>
@@ -67,6 +82,7 @@
 <script>
 import CarModal from './CarModal';
 import RejectReason from './RejectReason';
+import RateModal from './RateModal';
 export default {
   props: ['rental', 'user'],
   data() {
@@ -75,11 +91,13 @@ export default {
       startDate: '',
       isVisible: false,
       isVisibleReason: false,
+      isVisibleRate: false,
       car: {},
+      canRate: false,
     };
   },
-  components: { CarModal, RejectReason },
-  mounted() {
+  components: { CarModal, RejectReason, RateModal },
+  async mounted() {
     this.rent = this.rental;
     var options = {
       weekday: 'short',
@@ -91,8 +109,25 @@ export default {
     };
     this.startDate = new Date(this.rental.startDate);
     this.startDate = this.startDate.toLocaleString('en-US', options);
+    //Proverimo da li moze da oceni objekat (ako ga nije do sada ocenio)
+    this.canRate = await this.canUserRate();
   },
   methods: {
+    async canUserRate() {
+      let token = localStorage.getItem('user');
+      const res = await fetch(
+        `http://127.0.0.1:3000/api/v1/objects/${this.rent.object.id}/reviews/canRate`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await res.json();
+      return data.data.canRate;
+    },
     showCarModal(car) {
       this.car = car;
       this.isVisible = true;
@@ -114,16 +149,22 @@ export default {
       );
       const data = await res.json();
       this.rent = data.data.newRental;
+      this.$emit('update', data.data.newUser);
     },
     showRejectModal() {
       this.isVisibleReason = true;
     },
     hideRejectModal() {
       this.isVisibleReason = false;
-      console.log('hide');
     },
-    async rejectReason(reason){
-        let token = localStorage.getItem('user');
+    showRateModal() {
+      this.isVisibleRate = true;
+    },
+    hideRateModal() {
+      this.isVisibleRate = false;
+    },
+    async rejectReason(reason) {
+      let token = localStorage.getItem('user');
       const res = await fetch(
         `http://127.0.0.1:3000/api/v1/rentals/${this.rent.id}`,
         {
@@ -132,8 +173,8 @@ export default {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
-            body: JSON.stringify({
-            newStatus: "REJECTED",
+          body: JSON.stringify({
+            newStatus: 'REJECTED',
             reason: reason,
           }),
         }
@@ -142,7 +183,7 @@ export default {
       this.rent = data.data.newRental;
     },
     async updateRental(status) {
-        let token = localStorage.getItem('user');
+      let token = localStorage.getItem('user');
       const res = await fetch(
         `http://127.0.0.1:3000/api/v1/rentals/${this.rent.id}`,
         {
@@ -151,14 +192,33 @@ export default {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
-            body: JSON.stringify({
+          body: JSON.stringify({
             newStatus: status,
           }),
         }
       );
       const data = await res.json();
       this.rent = data.data.newRental;
-      console.log(this.rent);
+    },
+    async rateStore(review) {
+      this.hideRateModal();
+      //rate object
+      let token = localStorage.getItem('user');
+      const res = await fetch(
+        `http://127.0.0.1:3000/api/v1/objects/${this.rent.object.id}/reviews`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            comment: review.comment,
+            rating: review.rating,
+          }),
+        }
+      );
+      this.$emit('rated');
     },
   },
 };

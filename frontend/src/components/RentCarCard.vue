@@ -23,9 +23,6 @@ export default {
       score: '',
     };
   },
-  mounted() {
-    console.log(this.object);
-  },
   methods: {
     viewStore() {
       this.$router.push({

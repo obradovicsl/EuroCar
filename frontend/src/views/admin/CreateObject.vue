@@ -158,7 +158,6 @@ export default {
             address: this.address,
           };
 
-          console.log(this.location);
         }.bind(this)
       );
     },
@@ -194,7 +193,6 @@ export default {
         }),
       });
       let data = await response.json();
-      console.log(data);
     },
   },
   async mounted() {
@@ -214,7 +212,6 @@ export default {
       }
     );
     const data = await response.json();
-    console.log(data.data.availableManagers);
     this.availableManagers = data.data.availableManagers;
 
     if(this.map){

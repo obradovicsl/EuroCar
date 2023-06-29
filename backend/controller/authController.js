@@ -4,7 +4,6 @@ const catchAsync = require('./../utils/catchAsync');
 const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
 
-
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
@@ -15,11 +14,13 @@ const createSendToken = (user, statusCode, res) => {
   const token = signToken(user.id);
 
   const cookieOptions = {
-    expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
     httpOnly: true, //Cookiu ne moze pristupiti browser(ne moze ga ni menjati)
   };
 
-  if(process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
 
   res.cookie('jwt', token, cookieOptions);
 
@@ -27,12 +28,16 @@ const createSendToken = (user, statusCode, res) => {
     status: 'success',
     token,
     data: {
-      user
-    }
+      user,
+    },
   });
-}
+};
 
 exports.signup = catchAsync(async (req, res, next) => {
+  const users = await User.findAll();
+  if (users.some((user) => user.username == req.body.username))
+    return next(new AppError('Username is taken!', 404));
+
   const customer = {
     username: req.body.username,
     password: req.body.password,
@@ -40,12 +45,12 @@ exports.signup = catchAsync(async (req, res, next) => {
     lastName: req.body.lastName,
     gender: req.body.gender,
     birthDate: req.body.birthDate,
-    role: "customer",
+    role: 'customer',
     rentals: [],
-    basket: [],
+    basket: { vehicles: [], totalQuantity: 0, totalprice: 0 },
     points: 0,
-    customerType: 3
-  }
+    customerType: 3,
+  };
 
   const newCustomer = await User.create(customer);
   createSendToken(newCustomer, 201, res);
@@ -60,10 +65,14 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   //Provera da li su username i sifra validni
-  const user = await User.checkValidity({username, password});
-  if(!user){
+  const user = await User.checkValidity({ username, password });
+  if (!user) {
     return next(new AppError('Incorrect username or password', 401));
   }
+
+  if (user?.blocked == true || user.active == false)
+    return next(new AppError('User is no longer active', 401));
+
   createSendToken(user, 200, res);
 });
 
@@ -87,8 +96,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   // Proveravamo da li korisnik i dalje postoji
   const user = await User.findById(decoded.id);
-  if(!user)
-  {
+  if (!user) {
     return next(new AppError('The user does not no longer exist', 401));
   }
   //Dozvoljen pristup protected ruti

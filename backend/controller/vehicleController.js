@@ -41,6 +41,7 @@ exports.createVehicle = catchAsync(async (req, res, next) => {
     description: req.body.description,
     image: req.body.image,
     available: true,
+    active: true,
   };
 
   const newVehicle = await Vehicle.create(vehicle);
@@ -67,10 +68,8 @@ exports.updateVehicle = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteVehicle = catchAsync(async (req, res, next) => {
-  const vehicle = await Vehicle.findById(req.params.id);
-  if (!vehicle) return next(new AppError('Vehicle does not exist!', 404));
-
-  await Vehicle.remove(req.params.id);
+  const vehicle = await Vehicle.findByIdAndUpdate(req.params.id, { active: false });
+  if (!vehicle) next(new AppError('No vehicle found!', 404));
 
   res.status(202).json({
     status: 'success',
@@ -92,7 +91,6 @@ exports.getAvailableVehicles = catchAsync(async (req, res, next) => {
     let renStartDate = new Date(ren.startDate);
     let renEndDate = new Date(ren.endDate);
     
-    console.log(renStartDate, renEndDate);
     if (
       (renStartDate >= startDate && renStartDate <= endDate) ||
       (renEndDate >= startDate && renEndDate <= endDate)
@@ -104,7 +102,6 @@ exports.getAvailableVehicles = catchAsync(async (req, res, next) => {
   }
 
   unavailableVehicles = [...unavailableVehicles];
-  console.log(unavailableVehicles);
 
   const availableVehicles = allVehicles.filter(
     (veh) =>

@@ -3,6 +3,8 @@ const AppError = require('../utils/appError');
 const User = require('../model/userModel');
 const Vehicle = require('../model/vehicleModel');
 const Initialize = require('../utils/initialize');
+const Filter = require('../utils/filter');
+
 
 exports.getAllUsers = catchAsync(async (req, res, next) => {
   const users = await User.findAll();
@@ -86,7 +88,6 @@ exports.createManager = catchAsync(async (req, res, next) => {
 exports.getAvailableManagers = catchAsync(async (req, res, next) => {
   const users = await User.findAll();
   const allManagers = users.filter((user) => user.role === 'manager');
-  console.log(allManagers);
 
   const availableManagers = new Array();
 
@@ -110,13 +111,15 @@ exports.updateUser = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteUser = catchAsync(async (req, res, next) => {
-  const user = await User.findByIdAndUpdate(req.params.id, { active: true });
+  const user = await User.findByIdAndUpdate(req.params.id, { active: false });
 
   if (!user) next(new AppError('No user found!', 404));
 
-  res.status(204).json({
+  res.status(200).json({
     status: 'success',
-    user: null,
+    data: {
+      user
+    },
   });
 });
 
@@ -133,11 +136,7 @@ exports.addToBasket = catchAsync(async (req, res, next) => {
     );
   } else {
     const vehicle = await Vehicle.findById(req.body.vehicleId);
-    basket = addItemToBasket(
-      user.basket,
-      vehicle,
-      user.customerType
-    );
+    basket = addItemToBasket(user.basket, vehicle, user.customerType);
   }
 
   user = await User.findByIdAndUpdate(req.user.id, { basket: basket });
@@ -173,7 +172,7 @@ const addItemToBasket = function (basket, vehicle, customerType) {
       veh.price += veh.vehicle.price * basket.daysNum;
       basket.totalQuantity++;
       basket.totalPrice += veh.vehicle.price * basket.daysNum;
-      console.log(basket.daysNum);
+
       if (customerType == 2)
         basket.discountedPrice = basket.totalPrice - basket.totalPrice * 0.05;
       if (customerType == 1)
@@ -189,6 +188,58 @@ const addItemToBasket = function (basket, vehicle, customerType) {
   });
   basket.totalQuantity++;
   basket.totalPrice += vehicle.price * basket.daysNum;
+
+  if (customerType == 2)
+    basket.discountedPrice = basket.totalPrice - basket.totalPrice * 0.05;
+  if (customerType == 1)
+    basket.discountedPrice = basket.totalPrice - basket.totalPrice * 0.1;
+
+  return basket;
+};
+
+exports.removeFromBasket = catchAsync(async (req, res, next) => {
+  let user = await User.findById(req.user.id);
+  let basket = { vehicles: [], totalQuantity: 0, totalPrice: 0 };
+  if (user.basket.totalQuantity != 0) {
+    const vehicle = await Vehicle.findById(req.body.vehicleId);
+    basket = removeItemFromBasket(user.basket, vehicle, user.customerType);
+  }
+
+  user = await User.findByIdAndUpdate(req.user.id, { basket: basket });
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      user,
+    },
+  });
+});
+
+const removeItemFromBasket = function (basket, vehicle, customerType) {
+  let removeId;
+  for (veh of basket.vehicles) {
+
+    if (veh.vehicle.id == vehicle.id) {
+      if (veh.quantity > 1) {
+        //Ako ima vise od 1 vozila - samo smanji broj
+        veh.quantity--;
+        veh.price -= veh.vehicle.price * basket.daysNum;
+      }else{
+        //Ako je poslednje vozilo - izbaci ga iz niza
+        removeId = veh.vehicle.id;
+      }
+    }
+  }
+
+  basket.vehicles = basket.vehicles.filter(veh => veh.vehicle.id != removeId);
+  
+  basket.totalQuantity--;
+  basket.totalPrice -= veh.vehicle.price * basket.daysNum;
+
+  if (customerType == 2)
+    basket.discountedPrice = basket.totalPrice - basket.totalPrice * 0.05;
+  if (customerType == 1)
+    basket.discountedPrice = basket.totalPrice - basket.totalPrice * 0.1;
   return basket;
 };
 
@@ -203,5 +254,62 @@ exports.getBasket = catchAsync(async (req, res, next) => {
     data: {
       basket,
     },
+  });
+});
+
+exports.searchUsers = catchAsync(async (req, res, next) => {
+  let users = await User.findAll();
+
+  const firstName = req.query.firstName;
+  const lastName = req.query.lastName;
+  const username = req.query.username;
+
+  if (firstName && firstName != '')
+    users = Filter.filterByFirstName(users, firstName);
+  if (lastName &&  lastName != '' )
+    users = Filter.filterByLastName(users, lastName);
+  if (username && username != '')
+    users = Filter.filterByUsername(users, username);
+
+  res.status(200).json({
+    status: 'success',
+    result: users.length,
+    data: { users },
+  });
+});
+
+
+exports.filterUsers = catchAsync(async (req, res, next) => {
+  let users = await User.findAll();
+
+  const role = req.query.role;
+  const sus = req.query.sus;
+
+  if (role && role != '' && role != 'None')
+    users = Filter.filterByRole(users, role);
+  if (sus && sus != '' && sus != 'false')
+    users = Filter.filterBySus(users, sus);
+
+  res.status(200).json({
+    status: 'success',
+    result: users.length,
+    data: { users },
+  });
+});
+
+exports.blockUser = catchAsync(async (req, res, next) => {
+
+  await User.findByIdAndUpdate(req.params.id, {blocked: true});
+
+  res.status(202).json({
+    status: 'success',
+  });
+});
+exports.unblockUser = catchAsync(async (req, res, next) => {
+
+  await User.findByIdAndUpdate(req.params.id, {blocked: false});
+
+  res.status(202).json({
+    status: 'success',
   });
 });

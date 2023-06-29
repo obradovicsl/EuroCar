@@ -74,8 +74,6 @@ exports.filterObjects = catchAsync(async (req, res, next) => {
   const type = req.query.type;
   const isOpen = req.query.open;
 
-  console.log(fuelType, type, isOpen);
-
   if (fuelType && fuelType != 'None') objects = Filter.filterByFuelType(objects, fuelType);
   if (type && type != 'None') objects = Filter.filterByVehType(objects, type);
   if (isOpen && isOpen != 'False') objects = Filter.filterByOpenState(objects);
@@ -88,9 +86,8 @@ exports.filterObjects = catchAsync(async (req, res, next) => {
 });
 
 exports.createObject = catchAsync(async (req, res, next) => {
-  console.log(req.body);
   let manager = await User.findById(req.body.managerId);
-  console.log(manager);
+
   if (!manager || manager.storeId != '' || manager.role != 'manager')
     return next(
       new AppError('Manager does not exist or he is already a store owner', 404)

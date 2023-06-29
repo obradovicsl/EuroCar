@@ -4,6 +4,7 @@ const User = require('../model/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const Initialize = require('../utils/initialize');
+const Filter = require('../utils/filter');
 
 exports.getAllRentals = catchAsync(async (req, res, next) => {
   const rentals = await Rental.findAll();
@@ -22,15 +23,8 @@ exports.getAllRentals = catchAsync(async (req, res, next) => {
 });
 
 exports.getCustomersRentals = catchAsync(async (req, res, next) => {
-  const allRentals = await Rental.findAll();
-  const newRentals = new Array();
-
-  const rentals = allRentals.filter((ren) => ren.customerId == req.user.id);
-
-  for (let rent of rentals) {
-    rent = await Initialize.initializeRentals(rent);
-    newRentals.push(rent);
-  }
+  let newRentals = await customerRentals(req.user);
+  newRentals = Initialize.sortRentals(newRentals);
 
   res.status(200).json({
     status: 'success',
@@ -40,17 +34,8 @@ exports.getCustomersRentals = catchAsync(async (req, res, next) => {
 });
 
 exports.getManagersRentals = catchAsync(async (req, res, next) => {
-  const allRentals = await Rental.findAll();
-  const newRentals = new Array();
-
-  const rentals = allRentals.filter((ren) => {
-    return ren.rentalCompanyId == req.user.storeId;
-  });
-
-  for (let rent of rentals) {
-    rent = await Initialize.initializeRentals(rent);
-    newRentals.push(rent);
-  }
+  let newRentals = await managerRentals(req.user);
+  newRentals = Initialize.sortRentals(newRentals);
 
   res.status(200).json({
     status: 'success',
@@ -59,16 +44,33 @@ exports.getManagersRentals = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getRental = catchAsync(async (req, res, next) => {
-  const id = req.params.id;
-  const rental = await Rental.findById(id);
+exports.searchRental = catchAsync(async (req, res, next) => {
+  let newRentals;
 
-  if (!rental)
-    return next(new AppError('There is no rental with that id!', 404));
+  if (req.user.role == 'manager') newRentals = await managerRentals(req.user);
+  if (req.user.role == 'customer') newRentals = await customerRentals(req.user);
+
+  let storeName;
+  if (req.user.role != 'manager') storeName = req.query.storeName;
+
+  const priceMin = req.query.minPrice;
+  const priceMax = req.query.maxPrice;
+  const startDate = req.query.startDate;
+  const endDate = req.query.endDate;
+
+  if (storeName && storeName != '' && req.user.role != 'manager')
+    newRentals = Filter.filterByStore(newRentals, storeName);
+  if (priceMin && priceMax && priceMin != '' && priceMax != '')
+    newRentals = Filter.filterByPrice(newRentals, priceMin, priceMax);
+  if (startDate && endDate && startDate != '' && endDate != '')
+    newRentals = Filter.filterByDate(newRentals, startDate, endDate);
+
+  newRentals = Initialize.sortRentals(newRentals);
 
   res.status(200).json({
     status: 'success',
-    data: { rental },
+    result: newRentals.length,
+    data: { newRentals },
   });
 });
 
@@ -84,7 +86,6 @@ exports.createRental = catchAsync(async (req, res, next) => {
 
   // start and end date
   const startDate = new Date(req.body.startDate);
-  console.log(startDate.getDate());
   const endDate = new Date(
     startDate.getTime() + req.body.rentedDays * 24 * 60 * 60 * 1000
   );
@@ -110,11 +111,13 @@ exports.createRental = catchAsync(async (req, res, next) => {
   if (points > 5000) customerType = 1; //Popust 10%
 
   // Add new points, type, and reset basket
-  const newUser = await User.findByIdAndUpdate(req.user.id, {
+  let newUser = await User.findByIdAndUpdate(req.user.id, {
     points,
     customerType,
     basket: { vehicles: [], totalQuantity: 0, totalPrice: 0 },
   });
+
+  newUser = await Initialize.initializeUsers(newUser);
 
   const newRental = await Rental.create(rental);
 
@@ -136,25 +139,37 @@ exports.cancelRental = catchAsync(async (req, res, next) => {
   if (rental.status != 'PROCESSING')
     return next(new AppError('Only rentals in process can be canceled!', 400));
 
-  const points = user.points - (rental.price / 1000) * 133 * 4;
+  let points = user.points - (rental.price / 1000) * 133 * 4;
   if (points < 0) points = 0;
   let customerType = 3;
   if (points > 1000) customerType = 2; //Popust 5%
   if (points > 5000) customerType = 1; //Popust 10%
-  let canceledRentals = 1;
-  if(user.canceledRentals) 
-    canceledRentals = user.cancelRentals++;
 
-  await User.findByIdAndUpdate(user.id, { points, customerType, canceledRentals });
+  let newCanceledRental = new Date();
+  let canceledRentals = new Array();
+  if (!user.canceledRentals) canceledRentals.push(newCanceledRental);
+  else {
+    canceledRentals = [...user.canceledRentals];
+    canceledRentals.push(newCanceledRental);
+  }
 
-  const newRental = await Rental.findByIdAndUpdate(req.params.id, {
+  const newUser = await User.findByIdAndUpdate(user.id, {
+    points,
+    customerType,
+    canceledRentals,
+  });
+
+  let newRental = await Rental.findByIdAndUpdate(req.params.id, {
     status: 'CANCELED',
   });
+
+  newRental = await Initialize.initializeRentals(newRental);
 
   res.status(200).json({
     status: 'success',
     data: {
       newRental,
+      newUser,
     },
   });
 });
@@ -169,18 +184,15 @@ exports.updateRentalStatus = catchAsync(async (req, res, next) => {
   if (status == 'REJECTED' && !req.body.reason)
     return next(new AppError('You need to specify reason!', 400));
 
-
   let newRental = {};
 
   if (!isStateRespected(rental, status))
     return next(
       new AppError('That status update is not possible(visit help)', 400)
     );
-console.log(newRental);
-if (status.toUpperCase() == 'REJECTED')
-newRental = await rejectRental(req.params.id, req.body.reason);
+  if (status.toUpperCase() == 'REJECTED')
+    newRental = await rejectRental(req.params.id, req.body.reason);
 
-console.log(newRental);
   if (status.toUpperCase() == 'APPROVED')
     newRental = await approveRental(req.params.id);
 
@@ -190,11 +202,42 @@ console.log(newRental);
   if (status.toUpperCase() == 'RETURNED')
     newRental = await returnRental(req.params.id);
 
+  newRental = await Initialize.initializeRentals(newRental);
+
   res.status(200).json({
     status: 'success',
     data: { newRental },
   });
 });
+
+const customerRentals = async function (user) {
+  const allRentals = await Rental.findAll();
+  const newRentals = new Array();
+
+  const rentals = allRentals.filter((ren) => ren.customerId == user.id);
+
+  for (let rent of rentals) {
+    rent = await Initialize.initializeRentals(rent);
+    newRentals.push(rent);
+  }
+  return newRentals;
+};
+
+const managerRentals = async function (user) {
+  const allRentals = await Rental.findAll();
+  let newRentals = new Array();
+
+  const rentals = allRentals.filter((ren) => {
+    return ren.rentalCompanyId == user.storeId;
+  });
+
+  for (let rent of rentals) {
+    rent = await Initialize.initializeRentals(rent);
+    newRentals.push(rent);
+  }
+
+  return newRentals;
+};
 
 const isStateRespected = function (rental, newStatus) {
   if (
@@ -231,8 +274,6 @@ const possessRental = async function (id) {
     return rental.rentedVehiclesIds.some((vehId) => veh.id == vehId);
   });
 
-  console.log(vehicles);
-
   for (veh of vehicles) {
     await Vehicle.findByIdAndUpdate(veh.id, { available: false });
   }
@@ -249,17 +290,8 @@ const returnRental = async function (id) {
     return rental.rentedVehiclesIds.some((vehId) => veh.id == vehId);
   });
 
-  console.log(vehicles);
-
   for (veh of vehicles) {
     await Vehicle.findByIdAndUpdate(veh.id, { available: true });
   }
   return rental;
-};
-
-const isValidManager = function (rental, manager) {
-  for (store of rental.rentalCompanyIds) {
-    if (store == manager.storeId) return true;
-  }
-  return false;
 };

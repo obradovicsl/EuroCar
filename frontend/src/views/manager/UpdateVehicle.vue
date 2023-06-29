@@ -1,6 +1,7 @@
 <template>
-  <div class="container p-4">
-    <form @submit="updateVehicle">
+  <div class="container">
+    <form @submit="updateVehicle" class="form">
+      <h2>Update Vehicle</h2>
       <div class="mb-3">
         <div class="row">
           <div class="col">
@@ -157,7 +158,6 @@ export default {
     };
   },
   async mounted() {
-    console.log(this.id);
     const token = localStorage.getItem('user');
     const res = await fetch(
       `http://127.0.0.1:3000/api/v1/vehicles/${this.id}`,
@@ -208,7 +208,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .error {
   color: red;
 }
@@ -219,4 +219,14 @@ export default {
   cursor: pointer;
   color: #0b7285;
 }
+
+.form{
+  background-color: #ddd;
+  border-radius: 20px;
+  padding: 20px;
+}
+.container{
+    padding: 50px 250px 20px 250px;
+}
+
 </style>

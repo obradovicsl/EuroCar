@@ -4,14 +4,14 @@ const { writeDataToFile } = require('../utils/files')
 
 const findAll = function(){
   return new Promise((resolve, reject) => {
-    vehicles = vehicles.filter(veh => veh?.deleted != true);
+    vehicles = vehicles.filter(veh => veh.active == true);
     resolve(vehicles);
   })
 }
 
 const findById = function(id){
   return new Promise((resolve, reject) => {
-    const vehicle = vehicles.find(c => c.id == id & c?.deleted != true)
+    const vehicle = vehicles.find(veh => veh.id == id & veh.active == true)
     resolve(vehicle);
   })
 }

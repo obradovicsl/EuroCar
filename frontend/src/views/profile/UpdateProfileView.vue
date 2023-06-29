@@ -76,7 +76,12 @@ export default {
           this.error = true;
           this.errorMessage = data.message;
         } else {
-          this.$router.push({ name: 'successful' });
+          this.$router.push({
+          name: 'profile',
+          params: {
+            id: this.$root.loggedUser.id
+          },
+        });
         }
       } catch (err) {
         console.log(err);

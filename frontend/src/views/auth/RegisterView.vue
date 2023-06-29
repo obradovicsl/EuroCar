@@ -14,7 +14,6 @@
                   <div class="form-outline form-white mb-4">
                     <input
                       type="text"
-                      id="typeEmailX"
                       class="form-control form-control-sm"
                       required
                       v-model="firstName"
@@ -26,7 +25,6 @@
                   <div class="form-outline form-white mb-4">
                     <input
                       type="text"
-                      id="typeEmailX"
                       class="form-control form-control-sm"
                       required
                       v-model="lastName"
@@ -36,7 +34,6 @@
                   <div class="form-outline form-white mb-4">
                     <input
                       type="text"
-                      id="typeEmailX"
                       class="form-control form-control-sm"
                       required
                       v-model="username"
@@ -47,7 +44,6 @@
                   <div class="form-outline form-white mb-4">
                     <input
                       type="password"
-                      id="typePasswordX"
                       class="form-control form-control-sm"
                       required
                       v-model="password"
@@ -59,7 +55,6 @@
                   <div class="form-outline form-white mb-4">
                     <input
                       type="password"
-                      id="typePasswordX"
                       class="form-control form-control-sm"
                       required
                       v-model="confirmPassword"
@@ -99,7 +94,8 @@
                     Register
                   </button>
 
-                  <p v-if="error" class="error">Wrong username or password</p>
+                  <p v-if="error" class="error">Username is taken</p>
+                  <p v-if="passError" class="error">Passwords doesn't match</p>
                 </form>
               </div>
             </div>
@@ -122,39 +118,44 @@ export default {
       password: '',
       confirmPassword: '',
       error: false,
+      passError: false,
     };
   },
   methods: {
     async register() {
       try {
-        let response = await fetch(
-          'http://127.0.0.1:3000/api/v1/users/signup',
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              username: this.username,
-              password: this.password,
-              firstName: this.firstName,
-              lastName: this.lastName,
-              gender: this.gender,
-              birthDate: this.birthDate,
-            }),
+        if (this.password == this.confirmPassword) {
+          let response = await fetch(
+            'http://127.0.0.1:3000/api/v1/users/signup',
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                username: this.username,
+                password: this.password,
+                confirmPassword: this.confirmPassword,
+                firstName: this.firstName,
+                lastName: this.lastName,
+                gender: this.gender,
+                birthDate: this.birthDate,
+              }),
+            }
+          );
+          let data = await response.json();
+          if (data.status != 'success') {
+            this.error = true;
+          } else {
+            this.error = false;
+            localStorage.setItem('user', data.token);
+            this.$root.isLoged = true;
+            this.$root.loggedUser = data.data.user;
+            this.$root.userRole = data.data.user.role;
+            this.$router.push({ name: 'successful' });
           }
-        );
-        let data = await response.json();
-        console.log(data);
-        if (data.status != 'success') {
-          this.error = true;
-        } else {
-          this.error = false;
-          localStorage.setItem('user', data.token);
-          this.$root.isLoged = true;
-          this.$root.loggedUser = data.data.user;
-          this.$root.userRole = data.data.user.role;
-          this.$router.push({ name: 'successful' });
+        }else{
+           this.passError = true;
         }
       } catch (err) {}
     },

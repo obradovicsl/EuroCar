@@ -69,6 +69,14 @@
                     Create Manager
                   </router-link>
                 </li>
+                <li>
+                  <router-link
+                    class="dropdown-item"
+                    :to="{ name: 'viewUsers' }"
+                  >
+                    View All Users
+                  </router-link>
+                </li>
               </ul>
             </li>
 
@@ -131,7 +139,6 @@ export default {
   async mounted() {
     document.title = 'Rent A Car';
     const token = localStorage.getItem('user');
-    console.log(token);
     if (!token) return;
     const res = await fetch(`http://127.0.0.1:3000/api/v1/users/me`, {
       method: 'GET',

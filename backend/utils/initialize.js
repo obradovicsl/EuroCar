@@ -1,9 +1,12 @@
 const Vehicle = require('../model/vehicleModel');
 const Object = require('../model/objectModel');
+const User = require('../model/userModel');
 const Rental = require('../model/rentalModel');
+const Review = require('../model/reviewModel');
 
 exports.initializeRentals = async function (rental) {
   const newRental = { ...rental };
+
   const vehicles = new Array();
   for (const vehicleId of newRental.rentedVehiclesIds) {
     const vehicle = await Vehicle.findById(vehicleId);
@@ -19,17 +22,30 @@ exports.initializeRentals = async function (rental) {
   return newRental;
 };
 
+exports.sortRentals = function (rentals) {
+  rentals.sort((a, b) => {
+    if (a.startDate > b.startDate) {
+      return -1; // a ide prije b
+    } else if (a.startDate < b.startDate) {
+      return 1; // b ide prije a
+    } else {
+      return 0; // nema promjene u redoslijedu
+    }
+  });
+  return rentals;
+};
+
 exports.initializeObject = async function (object) {
   try {
     const newObject = { ...object };
 
     const allVehicles = await Vehicle.findAll();
-
     const vehicles = new Array();
 
     //Populate vehicles
     for (const vehicle of allVehicles) {
-      if (vehicle.rentCarObjectId == newObject.id) vehicles.push(vehicle);
+      if (vehicle.rentCarObjectId == newObject.id && vehicle.active == true)
+        vehicles.push(vehicle);
     }
     newObject.vehicles = vehicles;
 
@@ -40,22 +56,30 @@ exports.initializeObject = async function (object) {
     var startTime = new Date();
     startTime.setHours(parseInt(hour, 10));
     startTime.setMinutes(parseInt(minut, 10));
-    
+
     const end = newObject.workingHours.to;
     var [hour, minut] = end.split(':');
     var endTime = new Date();
     endTime.setHours(parseInt(hour, 10));
     endTime.setMinutes(parseInt(minut, 10));
 
-    console.log(startTime, endTime);
     const date = new Date();
-    if(date > startTime && date < endTime)
-    {
+    if (date > startTime && date < endTime) {
       newObject.open = true;
-    }
-    else{
+    } else {
       newObject.open = false;
     }
+
+    const allReviews = await Review.findByObjectId(newObject.id);
+    if (allReviews.length == 0) {
+      newObject.rating = 4.5;
+    } else {
+      const sum = allReviews.reduce((sum, review) => {
+        return sum + review.rating;
+      }, 0);
+      newObject.rating = sum / allReviews.length;
+    }
+
     return newObject;
   } catch (err) {
     console.log(err);
@@ -76,4 +100,22 @@ exports.initializeUsers = async function (user) {
   newUser.rentals = rentals;
 
   return newUser;
+};
+
+exports.initializeReview = async function (review) {
+  const newReview = { ...review };
+
+  const allObjects = await Object.findAll();
+  const allUsers = await User.findAll();
+
+  for (const object of allObjects) {
+    if (object.id == newReview.objectId) newReview.object = object;
+  }
+  delete newReview.objectId;
+  for (const user of allUsers) {
+    if (user.id == newReview.userId) newReview.user = user;
+  }
+  delete newReview.userId;
+
+  return newReview;
 };

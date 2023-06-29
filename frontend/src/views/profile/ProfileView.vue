@@ -14,7 +14,11 @@
               <h5 class="my-3">{{ user.firstName }} {{ user.lastName }}</h5>
               <p class="text-muted mb-1">{{ user.role }}</p>
               <div class="d-flex justify-content-center mb-2">
-                <button type="button" class="btn btn-primary" @click="updateProfile">
+                <button
+                  type="button"
+                  class="btn btn-primary"
+                  @click="updateProfile"
+                >
                   Update profile
                 </button>
                 <button type="button" class="btn btn-outline-primary ms-1">
@@ -24,39 +28,65 @@
             </div>
           </div>
           <div class="card mb-4 mb-lg-0">
-            <div class="card-body p-0">
-              <ul class="list-group list-group-flush rounded-3">
-                <li
-                  class="list-group-item d-flex justify-content-between align-items-center p-3"
-                >
-                  <i class="fas fa-globe fa-lg text-warning"></i>
-                  <p class="mb-0">https://mdbootstrap.com</p>
-                </li>
-                <li
-                  class="list-group-item d-flex justify-content-between align-items-center p-3"
-                >
-                  <i class="fab fa-github fa-lg" style="color: #333333"></i>
-                  <p class="mb-0">mdbootstrap</p>
-                </li>
-                <li
-                  class="list-group-item d-flex justify-content-between align-items-center p-3"
-                >
-                  <i class="fab fa-twitter fa-lg" style="color: #55acee"></i>
-                  <p class="mb-0">@mdbootstrap</p>
-                </li>
-                <li
-                  class="list-group-item d-flex justify-content-between align-items-center p-3"
-                >
-                  <i class="fab fa-instagram fa-lg" style="color: #ac2bac"></i>
-                  <p class="mb-0">mdbootstrap</p>
-                </li>
-                <li
-                  class="list-group-item d-flex justify-content-between align-items-center p-3"
-                >
-                  <i class="fab fa-facebook-f fa-lg" style="color: #3b5998"></i>
-                  <p class="mb-0">mdbootstrap</p>
-                </li>
-              </ul>
+            <div class="card-body p-4" v-if="user.role != 'admin'">
+              <h3>Search</h3>
+              <form class="row g-3" @submit.prevent="search">
+                <div class="col-12" v-if="$root.loggedUser.role == 'customer'">
+                  <input
+                    type="text"
+                    class="form-control"
+                    v-model="storeName"
+                    placeholder="Store Name"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <input
+                    type="number"
+                    class="form-control"
+                    v-model="minPrice"
+                    placeholder="Min price"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <input
+                    type="number"
+                    class="form-control"
+                    v-model="maxPrice"
+                    placeholder="Max price"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label for="startDate" class="form-label">Start Date</label>
+
+                  <input
+                    type="date"
+                    class="form-control"
+                    v-model="startDate"
+                    placeholder="Start date"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label for="endDate" class="form-label">End Date</label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    v-model="endDate"
+                    placeholder="End date"
+                  />
+                </div>
+                <div>
+                  <button class="btn btn-primary">Search</button>
+                </div>
+              </form>
+
+              <h3 class="mt-4">Sort by</h3>
+              <select class="form-select" v-model="sortValue" @change="sort">
+                <option value="Name" v-if="$root.loggedUser.role == 'customer'">
+                  Name
+                </option>
+                <option value="Price">Price</option>
+                <option value="Date">Date</option>
+              </select>
             </div>
           </div>
         </div>
@@ -107,15 +137,23 @@
                   <p class="mb-0">Points</p>
                 </div>
                 <div class="col-sm-9">
-                  <p class="text-muted mb-0">{{ user.points }}</p>
+                  <p class="text-muted mb-0">{{ Math.trunc(user.points*100) / 100 }}</p>
                 </div>
               </div>
             </div>
           </div>
           <div class="row" v-if="user.role != 'admin'">
             <h1>Your Rentals</h1>
-            <div class="col-md-12 mb-4" v-for="rental in rentals" :key="rental.id">
-              <RentalCard :rental="rental" :user="user"/>
+            <div
+              class="col-md-12 mb-4"
+              v-for="rental in rentals"
+              :key="rental.id"
+            >
+              <RentalCard
+                :rental="rental"
+                :user="user"
+                @update="updateUser"
+              />
             </div>
           </div>
         </div>
@@ -136,21 +174,30 @@ export default {
       id: this.$route.params.id,
       user: {},
       rentals: [],
+      storeName: '',
+      minPrice: '',
+      maxPrice: '',
+      startDate: '',
+      endDate: '',
+      sortValue: '',
     };
   },
   async mounted() {
-    const token = localStorage.getItem('user');
-    this.user = await this.fetchUser(token);
-    if (this.user.role == 'customer')
-      this.rentals = await this.customerRentals(token);
-    if (this.user.role == 'manager')
-      this.rentals = await this.managerRentals(token);
+    await this.fetchRentals();
   },
   methods: {
     updateProfile() {
       this.$router.push({
         name: 'updateProfile',
       });
+    },
+    async fetchRentals() {
+      const token = localStorage.getItem('user');
+      this.user = await this.fetchUser(token);
+      if (this.user.role == 'customer')
+        this.rentals = await this.customerRentals(token);
+      if (this.user.role == 'manager')
+        this.rentals = await this.managerRentals(token);
     },
     async customerRentals(token) {
       const res = await fetch(
@@ -187,6 +234,61 @@ export default {
       });
       const data = await res.json();
       return data.data.user;
+    },
+    async search() {
+      let token = localStorage.getItem('user');
+      let response = await fetch(
+        `http://127.0.0.1:3000/api/v1/rentals/search?storeName=${this.storeName}&minPrice=${this.minPrice}&maxPrice=${this.maxPrice}&startDate=${this.startDate}&endDate=${this.endDate}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      let data = await response.json();
+      this.rentals = data.data.newRentals;
+    },
+    async sort() {
+      switch (this.sortValue) {
+        case 'Name':
+          this.rentals.sort((a, b) => {
+            if (a.object.name > b.object.name) {
+              return -1; // a ide prije b
+            } else if (a.object.name < b.object.name) {
+              return 1; // b ide prije a
+            } else {
+              return 0; // nema promjene u redoslijedu
+            }
+          });
+          break;
+        case 'Price':
+          this.rentals.sort((a, b) => {
+            if (a.price > b.price) {
+              return -1; // a ide prije b
+            } else if (a.price < b.price) {
+              return 1; // b ide prije a
+            } else {
+              return 0; // nema promjene u redoslijedu
+            }
+          });
+          break;
+        case 'Date':
+          this.rentals.sort((a, b) => {
+            if (a.startDate > b.startDate) {
+              return -1; // a ide prije b
+            } else if (a.startDate < b.startDate) {
+              return 1; // b ide prije a
+            } else {
+              return 0; // nema promjene u redoslijedu
+            }
+          });
+          break;
+      }
+    },
+    updateUser(user) {
+      this.user = user;
     },
   },
 };

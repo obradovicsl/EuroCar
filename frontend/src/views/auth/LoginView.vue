@@ -77,7 +77,6 @@ export default {
                 }else{
                     this.error = false;
                     localStorage.setItem("user", data.token);
-                    console.log(data.data.user);
                     this.$root.isLoged = true;
                     this.$root.loggedUser = data.data.user;
                     this.$router.push({name: 'home'});

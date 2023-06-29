@@ -1,5 +1,5 @@
 <template>
-  <div class="container pt-4">
+  <div class="container p-4">
     <div class="main">
       <img :src="store.logo" />
       <div class="rating">
@@ -39,8 +39,6 @@
       </l-map>
     </div>
 
-    <h1 class="mb-4">Rent a vehicle</h1>
-
     <h1 class="veh_header">Vehicles</h1>
     <button class="btn btn-primary mb-4" v-if="isOwner" @click="addNewVehicle">
       Add New Vehicle
@@ -52,7 +50,7 @@
         v-for="vehicle in store.vehicles"
         :key="vehicle.id"
       >
-        <VehicleCard :vehicle="vehicle" :isOwner="isOwner" :canRent="false" />
+        <VehicleCard :vehicle="vehicle" :isOwner="isOwner" :canRent="false" @delete="loadStore"/>
       </div>
     </div>
 
@@ -60,22 +58,23 @@
       <p>No vehicles</p>
     </div>
 
-   
-
     <h1 class="comment_header">Reviews</h1>
-    <!-- <div class="row mb-4">
+    <p v-if="reviews.length == 0">No reviews</p>
+
+    <div class="row comments">
       <div
-        class="col-sm-6 col-md-4 col-lg-3"
-        v-for="vehicle in store.vehicles"
-        :key="vehicle.id"
+        class="col-sm-12"
+        v-for="review in reviews"
+        :key="review.id"
       >
-        <VehicleCard :vehicle="vehicle" />
+        <ReviewCard :rev="review" :user="$root.loggedUser" :isOwner="isOwner"/>
       </div>
-    </div> -->
+    </div>
   </div>
 </template>
 
 <script>
+import ReviewCard from './../components/ReviewCard';
 import VehicleCard from './../components/VehicleCard';
 
 export default {
@@ -89,29 +88,26 @@ export default {
       store: { workingHours: '', location: '' },
       isOwner: false,
       vehicles: [],
-
+      reviews: [],
     };
   },
   components: {
-    VehicleCard,
+    ReviewCard,
+    VehicleCard
   },
   async mounted() {
-    const token = localStorage.getItem('user');
-    const res = await fetch(`http://127.0.0.1:3000/api/v1/objects/${this.id}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const data = await res.json();
-    this.store = data.data.object;
+    await this.loadStore();
+
+    if(this.$root.loggedUser.role == 'customer')
+      await this.loadReviewsForUser();
+    else
+      await this.loadAllReviews();
+
     this.latitude = this.store.location.lat;
     this.longitude = this.store.location.lon;
     this.markerLatLng = new Array();
     this.markerLatLng.push(this.latitude);
     this.markerLatLng.push(this.longitude);
-    this.vehicles = this.store.vehicles;
     if (this.map) {
       this.doSomethingOnReady();
     }
@@ -122,6 +118,52 @@ export default {
       this.isOwner = true;
   },
   methods: {
+    async loadStore() {
+      const token = localStorage.getItem('user');
+      const res = await fetch(
+        `http://127.0.0.1:3000/api/v1/objects/${this.id}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await res.json();
+      this.store = data.data.object;
+      this.vehicles = this.store.vehicles;
+    },
+    async loadReviewsForUser(){
+      const token = localStorage.getItem('user');
+      const res = await fetch(
+        `http://127.0.0.1:3000/api/v1/objects/${this.id}/reviews/forUsers`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await res.json();
+      this.reviews = data.data.reviews;
+    },
+    async loadAllReviews(){
+       const token = localStorage.getItem('user');
+      const res = await fetch(
+        `http://127.0.0.1:3000/api/v1/objects/${this.id}/reviews/`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await res.json();
+      this.reviews = data.data.reviews;
+    },
     doSomethingOnReady() {
       this.map = this.$refs.map.leafletObject;
       this.map.panTo([this.latitude, this.longitude]);
@@ -134,6 +176,10 @@ export default {
 </script>
 
 <style>
+.comments{
+  width: 60%;
+  margin: 0 auto;
+}
 .date {
   display: inline;
   width: 20%;

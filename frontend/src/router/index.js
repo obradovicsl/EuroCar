@@ -8,6 +8,7 @@ import RegisterView from '../views/auth/RegisterView.vue'
 import NotFound from '../views/auth/NotFound.vue'
 import CreateManager from '../views/admin/CreateManager.vue'
 import CreateObject from '../views/admin/CreateObject.vue'
+import ViewUsersView from '../views/admin/ViewUsersView.vue'
 import CreateVehicle from '../views/manager/CreateVehicle.vue'
 import UpdateVehicle from '../views/manager/UpdateVehicle.vue'
 import SuccessfulRegistration from '../views/auth/SuccessfulRegistration.vue'
@@ -79,6 +80,11 @@ const routes = [
     path: '/rent',
     name: 'rent',
     component: RentVehicleView
+  },
+  {
+    path: '/viewUsers',
+    name: 'viewUsers',
+    component: ViewUsersView
   },
   {
     path: '/:catchAll(.*)',

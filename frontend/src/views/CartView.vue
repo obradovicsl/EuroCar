@@ -19,7 +19,10 @@
                         {{ $root.loggedUser.basket.totalQuantity }} items
                       </h6>
                     </div>
-                    <hr class="my-4" />
+                    <hr
+                      class="my-4"
+                      v-if="$root.loggedUser.basket.totalQuantity != 0"
+                    />
 
                     <div
                       class="row mb-4 d-flex justify-content-between align-items-center"
@@ -43,6 +46,7 @@
                         <button
                           class="btn px-2"
                           onclick="this.parentNode.querySelector('input[type=number]').stepDown()"
+                          @click="removeVehicleFromBasket(vehicle.vehicle.id)"
                         >
                           <i class="fas fa-minus">-</i>
                         </button>
@@ -64,24 +68,29 @@
                           <i class="fas fa-plus">+</i>
                         </button>
                       </div>
-                      <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
-                        <h6 class="mb-0">€ {{ vehicle.price }}</h6>
+                      <div class="col-md-3 col-lg-2 col-xl-2">
+                        <h6 class="mb-0">
+                          € {{ vehicle.vehicle.price }} / 1 day
+                        </h6>
                       </div>
-                      <div class="col-md-1 col-lg-1 col-xl-1 text-end">
-                        <a href="#!" class="text-muted"
-                          ><i class="fas fa-times"></i
-                        ></a>
+                      <div class="col-md-3 col-lg-2 col-xl-2">
+                        <h6 class="mb-0">
+                          € {{ vehicle.price }} /
+                          {{ $root.loggedUser.basket.daysNum }} day
+                        </h6>
                       </div>
                     </div>
 
-                    <hr class="my-4" />
+                    <hr
+                      class="my-4"
+                      v-if="$root.loggedUser.basket.totalQuantity != 0"
+                    />
 
                     <div class="pt-5">
                       <h6 class="mb-0">
-                        <a href="#!" class="text-body" @click="backToShop"
-                          ><i class="fas fa-long-arrow-alt-left me-2"></i>Back
-                          to shop</a
-                        >
+                        <button class="btn" @click="backToShop">
+                          Back to shop
+                        </button>
                       </h6>
                     </div>
                   </div>
@@ -107,10 +116,16 @@
 
                     <div class="mb-5" v-if="$root.loggedUser.customerType != 3">
                       <div class="form-outline">
-                        <label class="form-label" for="form3Examplea2" v-if="$root.loggedUser.customerType == 2"
+                        <label
+                          class="form-label"
+                          for="form3Examplea2"
+                          v-if="$root.loggedUser.customerType == 2"
                           >5%</label
                         >
-                        <label class="form-label" for="form3Examplea2" v-if="$root.loggedUser.customerType == 1"
+                        <label
+                          class="form-label"
+                          for="form3Examplea2"
+                          v-if="$root.loggedUser.customerType == 1"
                           >10%</label
                         >
                       </div>
@@ -133,6 +148,7 @@
                       class="btn btn-dark btn-block btn-lg"
                       data-mdb-ripple-color="dark"
                       @click="completePurchase"
+                      v-if="$root.loggedUser.basket.totalQuantity != 0"
                     >
                       Complete
                     </button>
@@ -151,32 +167,39 @@
 export default {
   methods: {
     async addVehicleToBasket(veh) {
-       let token = localStorage.getItem('user');
-      console.log(this.$root.loggedUser);
-      const res =await fetch(
-        `http://127.0.0.1:3000/api/v1/users/basket/`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            vehicleId: veh,
-          }),
-        }
-      );
+      let token = localStorage.getItem('user');
+      const res = await fetch(`http://127.0.0.1:3000/api/v1/users/basket/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          vehicleId: veh,
+        }),
+      });
       const data = await res.json();
       this.$root.loggedUser = data.data.user;
     },
-    removeVehicleFromBasket(veh) {
-      console.log(veh);
+    async removeVehicleFromBasket(veh) {
+      let token = localStorage.getItem('user');
+      const res = await fetch(`http://127.0.0.1:3000/api/v1/users/basket/`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          vehicleId: veh,
+        }),
+      });
+      const data = await res.json();
+      this.$root.loggedUser = data.data.user;
     },
-    async completePurchase(){
+    async completePurchase() {
+      try {
         let token = localStorage.getItem('user');
-       const res = await fetch(
-        `http://127.0.0.1:3000/api/v1/rentals/`,
-        {
+        const res = await fetch(`http://127.0.0.1:3000/api/v1/rentals/`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -186,15 +209,22 @@ export default {
             startDate: this.$root.startDate,
             rentedDays: this.$root.daysNum,
           }),
-        }
-      );
-      const data = await res.json();
-      console.log(data);
-      this.$root.loggedUser = data.data.user;
+        });
+        const data = await res.json();
+        this.$root.loggedUser = data.data.newUser;
+        this.$router.push({
+          name: 'profile',
+          params: {
+            id: this.$root.loggedUser.id
+          },
+        });
+      } catch (err) {
+        console.log(err);
+      }
     },
-    backToShop(){
-
-    }
+    backToShop() {
+      this.$router.push({ name: 'rent' });
+    },
   },
 };
 </script>

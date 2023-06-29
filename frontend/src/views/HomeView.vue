@@ -151,14 +151,6 @@ export default {
         `http://127.0.0.1:3000/api/v1/objects/filter?fuelType=${this.fuelFilter}&type=${this.typeFilter}&open=${this.openFilter}`
       );
       let data = await response.json();
-    //   this. = this.objects.forEach((obj) =>
-    //     data.data.objects.filter((o) => {
-    //     console.log(o.id, obj.id);
-    //     return o.id == obj.id
-    // })
-    //   );
-    //   console.log(this.);
-    //   console.log(this.objects);
       this.objects = data.data.objects;
     },
     async sort() {
