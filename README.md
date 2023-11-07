@@ -29,9 +29,9 @@ The frontend is built using VueJS 3
 
 Follow these instructions to set up and run the application on your local machine.
 
-1. Clone the project repository to your local machine:
- a) git clone [https://github.com/obradovicsl/EuroCar](https://github.com/obradovicsl/EuroCar)
- b) Or just simply download the file as a zip and unpack it
+1. Clone the project repository to your local machine:  
+ a) git clone [https://github.com/obradovicsl/EuroCar](https://github.com/obradovicsl/EuroCar)  
+ b) Or just simply download the file as a zip and unpack it  
 3. Navigate to the project directory via terminal
 4. Run **npm i command**
 5. For starting the project, you will need 2 terminals (one for the front, and one for the back)
