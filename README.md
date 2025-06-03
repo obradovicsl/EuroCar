@@ -25,6 +25,16 @@ The database is not used (it was emphasized in the specification), and all data 
 
 The frontend is built using VueJS 3
 
+<img width="1503" alt="Screenshot 2025-06-03 at 1 11 27 PM" src="https://github.com/user-attachments/assets/5fc02eda-1d08-4ac5-8f4e-f6f62f7c90bc" />
+[Profile informations - all rentals for logged user]
+
+<img width="1498" alt="Screenshot 2025-06-03 at 1 11 42 PM" src="https://github.com/user-attachments/assets/48af1080-dd28-4b04-a596-a07600b5ca03" />
+[Landing page - all rental companies with search and sort]
+
+<img width="670" alt="Screenshot 2025-06-03 at 1 12 26 PM" src="https://github.com/user-attachments/assets/8b23a76e-ddf4-4919-831a-cd3555b7655d" />
+[Company page - location and available vehicles]
+
+
 ## Getting started
 
 Follow these instructions to set up and run the application on your local machine.
